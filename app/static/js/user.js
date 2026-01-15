@@ -25,7 +25,7 @@ async function login(name,password){
         if(!res.ok){
             throw new Error("Problem in user.js")
         }
-        const data=await res.json
+        const data=await res.json()
         return data
     }
     catch(err){

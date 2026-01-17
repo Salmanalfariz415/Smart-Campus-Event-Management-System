@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/animejs@3.2.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+    <script src="../static/js/main.js" defer></script>
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+<!--nav bar-->
+    <div id="nav" class="grid grid-rows-1 grid-cols-3 bg-white h-28 fixed w-full z-10">
+        <div id="logo" class="col-span-1 bg-black flex justify-center items-center">
+            <img src="../static/images/logo.png" class="h-28 w-30">
+        </div>
+        <div class="col-span-1 bg-black"></div>
+        <div class="bg-black">
+            <ul class="nav-menu flex justify-end items-center space-x-20 py-11 text-white px-20">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#events" class="nav-link">Events </a></li>
+                <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+            </ul>
+        </div>
+<!--hero section-->
+    </div>
+    <div class="relative h-[60rem] w-full overflow-hidden">
+      <img
+        src="../static/images/concert.jpg" class="absolute inset-0 w-full h-full object-cover clip-hero z-[1]">
+      <div class="absolute inset-0 flex items-center justify-center">
+        <p class="colourtext z-[5] w-[80rem] h-40 text-7xl font-bold text-center">
+          Where campus life comes alive
+        </p>
+      </div>
+    </div>
+<!--red section-->
+    <div class="relative bg-gradient-to-b from-[#370617] via-[#9d0208] to-[#ffba08]
+                h-[80rem] z-[0] -mt-[10rem]">
+    </div>
+
+</body>
+</html>

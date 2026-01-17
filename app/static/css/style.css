@@ -9,3 +9,14 @@
 .clip-hero {
   clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 95%, 0 85%);
 }
+
+.card{
+    height: 21rem;
+    width: 31rem;
+    margin-left: 2rem;
+    border: 10px solid #161a1d;
+    border-radius: 1rem;
+    touch-action: none;
+    user-select: none;
+    overflow: hidden;
+}

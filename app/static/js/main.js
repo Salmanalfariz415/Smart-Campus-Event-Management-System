@@ -3,26 +3,16 @@ const split = new SplitType('.colourtext', { types: 'chars' });
 
 window.addEventListener('load', () => {
   gsap.registerPlugin(Draggable);
+  const container = document.querySelector('.event-cards');
 
-  Draggable.create(".card", {
+  Draggable.create(container, {
     type: "x",
-    bounds: ".event-cards",
-    inertia: false,
-    onDrag: function() {
-      const xChange = this.deltaX; // How much the mouse moved horizontally
-      const yChange = this.deltaY; // How much the mouse moved vertically
-      const draggedCard = this.target;
-
-      // Apply that same movement to all other cards
-      document.querySelectorAll(".card").forEach(card => {
-        if (card !== draggedCard) {
-          gsap.set(card, {
-            x: `+=${xChange}`,
-            y: `+=${yChange}`
-          });
-        }
-      });
-    }// Set to true only if you have the InertiaPlugin
+    bounds: {
+      maxX: 0, // Stops the leftmost card from moving right
+      minX: window.innerWidth - container.offsetWidth - 100 // Stops after the last card
+    },
+    inertia: true,
+    edgeResistance: 0.8,
   });
 });
 

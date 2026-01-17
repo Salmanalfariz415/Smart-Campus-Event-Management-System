@@ -20,3 +20,10 @@
     user-select: none;
     overflow: hidden;
 }
+.event-cards {
+    cursor: grab;
+    transition: box-shadow 0.3s ease;
+}
+.event-cards[style*="translate3d(0px"] {
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+}

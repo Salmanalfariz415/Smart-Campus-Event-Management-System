@@ -1,0 +1,116 @@
+.btn {
+ width: 4.5em;
+ height: 2em;
+ margin: 0.5em;
+ background: black;
+ color: #853c3c;
+ border: none;
+ border-radius: 0.9em;
+ font-size: 20px;
+ font-weight: bold;
+ cursor: pointer;
+ position: relative;
+ z-index: 1;
+ overflow: hidden;
+}
+
+.btn:hover {
+ color: black;
+}
+
+.btn:after {
+ content: "";
+ background: #853c3c;
+ position: absolute;
+ z-index: -1;
+ left: -20%;
+ right: -20%;
+ top: 0;
+ bottom: 0;
+ transform: skewX(-45deg) scale(0, 1);
+ transition: all 0.5s;
+}
+
+.btn:hover:after {
+ transform: skewX(-45deg) scale(1, 1);
+ -webkit-transition: all 0.5s;
+ transition: all 0.5s;
+}
+
+.input {
+  color: #fff;
+  font-size: 0.9rem;
+  background-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  padding-inline: 0.5em;
+  padding-block: 0.7em;
+  border: none;
+  border-bottom: var(--border-height) solid var(--border-before-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-border {
+  position: absolute;
+  background: var(--border-after-color);
+  width: 0%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  transition: width 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input:focus + .input-border {
+  width: 100%;
+}
+
+.form-control {
+  position: relative;
+  --width-of-input: 300px;
+}
+
+.input-alt {
+  font-size: 1.2rem;
+  padding-inline: 1em;
+  padding-block: 0.8em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-border-alt {
+  height: 3px;
+  background: linear-gradient(90deg, #FF6464 0%, #FFBF59 50%, #47C9FF 100%);
+  transition: width 0.4s cubic-bezier(0.42, 0, 0.58, 1.00);
+}
+
+.input-alt:focus + .input-border-alt {
+  width: 100%;
+}
+.submit {
+  transition: all 0.3s ease-in-out;
+  font-family: "Dosis", sans-serif;
+}
+
+.submit{
+  width: 150px;
+  height: 60px;
+  border-radius: 50px;
+  box-shadow: 0 10px 30px -6px rgba(18, 227, 10, 0.5);
+  outline: none;
+  cursor: pointer;
+  border: none;
+  font-size: 24px;
+  color: white;
+}
+
+.submit:hover {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.submit:active {
+  opacity: 0.5;
+}

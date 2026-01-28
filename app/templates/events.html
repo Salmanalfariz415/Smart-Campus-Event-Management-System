@@ -6,13 +6,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
     <script src="../static/js/main.js" defer></script>
+  <link rel="stylesheet" href="../static/css/style2.css">
 
 </head>
 <body class="bg-[#90323d] overflow-x-hidden">
-  <div class="fixed top-0 left-0 w-full h-16 bg-[#ff5a5f] border-b border-gray-200 z-50"></div>
-  <div class=""></div>
+  <div class="nav fixed top-0 left-0 w-full h-16 bg-[#ff5a5f] border-b border-gray-200 z-50"></div>
+  <div class="grid grid-cols-3 items-center search relative mt-16 h-28 w-full bg-white pt-3">
+    <button class="mx-10 btn col-span-1 h-10 mt-5">Filter</button>
+    <div class="col-span-2 flex justify-start item-center">
+      <div class="form-control mx-5">
+      <input class="text-black input input-alt h-16 rounded-xl px-2 border-2 border-red-400 w-[35rem]" placeholder="Search For Events" required="" type="text">
+      <span class="input-border input-border-alt"></span>
+    </div>
+    <button class="submit bg-green-600 h-10 w-24 rounded-xl text-xl text-white font-bold mt-3">Submit</button>
+    </div>
+  </div>
 
-  <div class="section1 mt-16 w-full overflow-hidden relative bg-white h-[35rem] pt-4">
+  <div class="section1 w-full overflow-hidden relative bg-white h-[35rem] pt-4">
 
     <div id="slider" class="flex transition-transform duration-500 ease-in-out">
   <div class="min-w-full h-[33rem] px-4">

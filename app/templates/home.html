@@ -13,15 +13,15 @@
 </head>
 <body>
 <!--nav bar-->
-    <div id="nav" class="grid grid-rows-1 grid-cols-3 bg-white h-28 fixed w-full z-10">
+    <div id="nav" class="grid grid-rows-1 grid-cols-4 bg-white h-28 fixed w-full z-10">
         <div id="logo" class="col-span-1 bg-black flex justify-center items-center">
-            <img src="../static/images/logo.png" class="h-28 w-30">
+            <img src="../static/images/logo.jpg" class="h-24 w-30">
         </div>
         <div class="col-span-1 bg-black"></div>
-        <div class="bg-black">
+        <div class="bg-black col-span-2">
             <ul class="nav-menu flex justify-end items-center space-x-20 py-11 text-white px-20">
                 <li><a href="#home" class="nav-link">Home</a></li>
-                <li><a href="#events" class="nav-link">Events </a></li>
+                <li><a href="./events.html" class="nav-link">Events </a></li>
                 <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
@@ -32,7 +32,7 @@
       <img
         src="../static/images/concert.jpg" class="absolute inset-0 w-full h-full object-cover clip-hero z-[1]">
       <div class="absolute inset-0 flex items-center justify-center">
-        <p class="colourtext z-[5] w-[80rem] h-40 text-7xl font-bold text-center">
+        <p class="absolute colourtext z-[5] w-[45rem] h-10 text-5xl font-bold text-right top-60">
           Where campus life comes alive
         </p>
       </div>
@@ -53,12 +53,24 @@
             </div>
             <div class="card">
                 <img src="../static/images/event3.jpg">
+                <div class="card__content">
+                <p class="card__title">When the Night Found Its Voice</p>
+                <p class="card__description">Under electric lights and roaring applause, every cheer, chord, and smile merged into a shared moment—where music didn’t just play, it connected everyone.</p>
+              </div>
             </div>
             <div class="card">
                 <img src="../static/images/event2">
+                <div class="card__content">
+                <p class="card__title">When the Stage Came Alive</p>
+                <p class="card__description">Bathed in lights and sound, every note carried the crowd higher—music turning moments into memories.</p>
+              </div>
             </div>
             <div class="card">
                 <img src="../static/images/event4.jpg">
+                <div class="card__content">
+                <p class="card__title">Where Ideas Took Shape</p>
+                <p class="card__description">With steady hands and sharp focus, imagination met precision—transforming curiosity into something real.</p>
+              </div>
             </div>
         </div>
         <div class="flex justify-center mt-32">

@@ -27,7 +27,7 @@ text.addEventListener("mouseenter", () => {
   anime({
     targets: split.chars,
     translateY: [
-      { value: '-6rem', easing: 'easeOutExpo', duration: 300 },
+      { value: '-3rem', easing: 'easeOutExpo', duration: 300 },
       { value: 0, easing: 'easeOutBounce', duration: 300 }
     ],
     rotate: [0, '-1turn'],

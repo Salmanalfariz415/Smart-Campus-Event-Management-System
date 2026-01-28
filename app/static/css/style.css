@@ -46,10 +46,6 @@
 body{
     overflow-x: hidden;
 }
-/* From Uiverse.io by gharsh11032000 */
-
-
-/* From Uiverse.io by gharsh11032000 */
 .card {
   position: relative;
   width: 30rem;
@@ -84,7 +80,7 @@ body{
   height: 100%;
   padding: 20px;
   box-sizing: border-box;
-  background-color: #ec9909;
+  background-color: rgba(236, 153, 9, 0.75);
   transform: rotateX(-90deg);
   transform-origin: bottom;
   transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);

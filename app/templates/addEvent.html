@@ -6,7 +6,7 @@
     <title>Add Event - Campus Events</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen ">
+<body class="bg-gray-50 min-h-screen">
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -29,7 +29,7 @@
                 <label class="block text-sm font-semibold text-gray-900 mb-3">Event Type</label>
                 <div class="grid grid-cols-2 gap-4">
                     <label class="relative flex items-center justify-center p-4 border-2 border-gray-300 rounded-lg cursor-pointer hover:border-indigo-500 transition-colors">
-                        <input type="radio" name="eventType" value="concert" class="sr-only peer" checked>
+                        <input type="radio" name="eventType" value="concert" class="sr-only peer">
                         <div class="text-center peer-checked:text-indigo-600">
                             <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
@@ -215,10 +215,6 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-3 pt-4">
-                <button type="button"
-                    class="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                    Save as Draft
-                </button>
                 <button type="submit"
                     class="flex-1 px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">
                     Publish Event
@@ -229,5 +225,6 @@
 
     <!-- Footer spacing -->
     <div class="h-16"></div>
+    <script src="../static/js/event.js" defer></script>
 </body>
 </html>

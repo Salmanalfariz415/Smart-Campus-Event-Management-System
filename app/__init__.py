@@ -7,13 +7,15 @@ def create_app():
     app = Flask(__name__)
     CORS(
         app,
-        origins=["http://localhost:63342", "http://127.0.0.1:63342"],
+        origins=["http://localhost:63342", "http://127.0.0.1:63342", "*"],
         supports_credentials=True
     )
 
     from app.routes.auth_routes import auth_bp
+    from app.routes.event_routes import event_bp
     print("REGISTERING AUTH BLUEPRINT")
     app.register_blueprint(auth_bp)#important
+    app.register_blueprint(event_bp)
 
     print("URL MAP:", app.url_map)
 

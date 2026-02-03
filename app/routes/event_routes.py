@@ -13,6 +13,7 @@ def submit():
     connection = None
     try:
         data = request.get_json()
+
         username = data.get('username')
         description = data.get('description')
         organization = data.get('organization')
@@ -32,14 +33,25 @@ def submit():
 
         connection = get_sql_connection()
 
-        event_id=event_dao.submit(connection,username,description,organization,start_date,end_date,start_time,end_time,venue,building,capacity,fee,reg,img,contact,website,tag)
+        event_id = event_dao.submitl(
+            connection, username, description, organization,
+            start_date, end_date, start_time, end_time,
+            venue, building, capacity, fee, reg,
+            img, contact, website, tag
+        )
 
         return jsonify({
             "message": "Registration successful",
             "user_id": event_id
         }), 201
+
     except Exception as e:
         traceback.print_tb(e.__traceback__)
+        return jsonify({
+            "error": "Event submission failed",
+            "details": str(e)
+        }), 500
+
     finally:
         if connection:
             connection.close()

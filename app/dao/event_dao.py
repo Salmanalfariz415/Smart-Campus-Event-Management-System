@@ -1,5 +1,5 @@
 import mysql.connector
-def submit(connection,username,desc,org,st_date,end_date,st_time,end_time,venue,building,capacity,fee,reg,img,contact,website,tag):
+def submitl(connection,username,desc,org,st_date,end_date,st_time,end_time,venue,building,capacity,fee,reg,img,contact,website,tag):
     cursor = None
     try:
         cursor = connection.cursor()

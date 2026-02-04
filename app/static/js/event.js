@@ -62,7 +62,7 @@ document.querySelector('form').addEventListener('submit', async (e) => {
                 capacity: capacity || null,
                 fee: fee || 0,
                 reg: registrationRequired,
-                image: '', // TODO: Handle image upload separately
+                image: uploadedImageUrl,
                 contact: contactEmail,
                 website: website,
                 tag: tags
@@ -95,18 +95,25 @@ imageDropZone.addEventListener('click', () => {
     imageInput.click();
 });
 
-imageInput.addEventListener('change', (e) => {
+imageInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
-    if (file) {
-        // You can implement image upload to server here
-        // For now, we'll just show the filename
-        const fileName = file.name;
-        imageDropZone.querySelector('p').textContent = `Selected: ${fileName}`;
+    if (!file) return;
 
-        // TODO: Upload image to server and get URL
-        // Then set the image URL in the form data
-    }
+    imageDropZone.querySelector('p').textContent = `Selected: ${file.name}`;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const res = await fetch('http://localhost:5000/event/image_upload', {
+        method: 'POST',
+        body: formData
+    });
+
+    const data = await res.json();
+    uploadedImageUrl = data.image_url;
+    console.log(data);
 });
+
 
 // Drag and drop for image
 imageDropZone.addEventListener('dragover', (e) => {

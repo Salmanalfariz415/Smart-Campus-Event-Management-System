@@ -3,6 +3,8 @@ from app.db.sql_connection import get_sql_connection
 import app.dao.event_dao as event_dao
 import traceback
 from flask_cors import cross_origin
+from werkzeug.utils import secure_filename
+import os, uuid
 
 
 event_bp = Blueprint('event', __name__, url_prefix='/event')
@@ -55,3 +57,29 @@ def submit():
     finally:
         if connection:
             connection.close()
+
+@event_bp.route('/image_upload', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=["http://localhost:63342"])
+def upload_image():
+    UPLOAD_FOLDER = r"C:\Users\Salman AL Fariz\PyCharmMiscProject\app\static\uploads"
+
+    if 'image' not in request.files:
+        return jsonify({"error": "No image provided"}), 400
+
+    file = request.files['image']
+
+    if file.filename == '':
+        return jsonify({"error": "Empty filename"}), 400
+
+    # Secure + unique filename
+    ext = os.path.splitext(file.filename)[1]
+    filename = f"{uuid.uuid4()}{ext}"
+
+    save_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(save_path)
+
+    image_url = f"/static/uploads/{filename}"
+
+    return jsonify({
+        "image_url": image_url
+    }), 201

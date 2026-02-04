@@ -38,7 +38,6 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     const capacity = document.getElementById("capacity").value;
     const fee = document.getElementById("fee").value;
     const registrationRequired = document.getElementById("registrationRequired").checked; // Use .checked not .value
-    const eventImage = document.querySelector('input[type="file"]').files[0];
     const contactEmail = document.getElementById("contactEmail").value;
     const website = document.getElementById("website").value;
     const tags = document.getElementById("tags").value;

@@ -28,7 +28,7 @@ def submit():
         capacity = data.get('capacity')
         fee = data.get('fee')
         reg = data.get('reg')
-        img = data.get('img')
+        img = data.get('image')
         contact = data.get('contact')
         website = data.get('website')
         tag = data.get('tag')

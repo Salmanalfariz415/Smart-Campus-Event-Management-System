@@ -37,4 +37,3 @@ text.addEventListener("mouseenter", () => {
     loop: false
   });
 });
-

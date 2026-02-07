@@ -1,136 +1,78 @@
-// Handle event type selection
-const eventRadios = document.querySelectorAll('input[name="eventType"]');
 
-eventRadios.forEach(radio => {
-    radio.addEventListener('click', (e) => {
-        const selectedValue = e.target.value;
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('DOM loaded, starting fetch...');
 
-        if (selectedValue === 'concert') {
-            handleConcertSelection();
-        } else if (selectedValue === 'hackathon') {
-            handleHackathonSelection();
-        }
-    });
-});
+  try {
+    const events = await add_card();
+    console.log('Events received:', events); // Check what you got
+    console.log('Number of events:', events?.length);
 
-function handleConcertSelection() {
-    console.log("Rock on! 🎸 Concert logic triggered.");
-}
+    const container = document.getElementById('eventsContainer');
+    console.log('Container found:', container); // Make sure container exists
 
-function handleHackathonSelection() {
-    console.log("Happy Hacking! 💻 Hackathon logic triggered.");
-}
-
-// Handle form submission
-document.querySelector('form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Get form values WHEN SUBMITTED (not when page loads)
-    const eventName = document.getElementById("eventName").value;
-    const eventDesc = document.getElementById("description").value;
-    const eventOrg = document.getElementById("organizer").value;
-    const startDate = document.getElementById("startDate").value;
-    const startTime = document.getElementById("startTime").value;
-    const endDate = document.getElementById("endDate").value;
-    const endTime = document.getElementById("endTime").value;
-    const venue = document.getElementById("venue").value;
-    const building = document.getElementById("building").value;
-    const capacity = document.getElementById("capacity").value;
-    const fee = document.getElementById("fee").value;
-    const registrationRequired = document.getElementById("registrationRequired").checked; // Use .checked not .value
-    const contactEmail = document.getElementById("contactEmail").value;
-    const website = document.getElementById("website").value;
-    const tags = document.getElementById("tags").value;
-
-    console.log('Submitting form data...');
-
-    try {
-        const res = await fetch("http://127.0.0.1:5000/event/submit", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username: eventName,
-                description: eventDesc,
-                organization: eventOrg,
-                start_date: startDate,
-                end_date: endDate,
-                start_time: startTime,
-                end_time: endTime,
-                venue: venue,
-                building: building,
-                capacity: capacity || null,
-                fee: fee || 0,
-                reg: registrationRequired,
-                image: uploadedImageUrl,
-                contact: contactEmail,
-                website: website,
-                tag: tags
-            })
-        });
-
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Problem in submission");
-        }
-
-        const data = await res.json();
-        console.log('Success:', data);
-        alert('Event published successfully!');
-
-        // Clear the form
-        document.querySelector('form').reset();
-
-    } catch (e) {
-        console.error('Error:', e);
-        alert('Failed to publish event: ' + e.message);
+    if (!events || events.length === 0) {
+      console.warn('No events to display');
+      container.innerHTML = '<p class="col-span-full text-center">No events available</p>';
+      return;
     }
-});
 
-// Handle image upload
-const imageInput = document.querySelector('input[type="file"]');
-const imageDropZone = imageInput.parentElement;
-
-imageDropZone.addEventListener('click', () => {
-    imageInput.click();
-});
-
-imageInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    imageDropZone.querySelector('p').textContent = `Selected: ${file.name}`;
-
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const res = await fetch('http://localhost:5000/event/image_upload', {
-        method: 'POST',
-        body: formData
+    events.forEach((eventData, index) => {
+      console.log(`Adding card ${index + 1}:`, eventData);
+      container.insertAdjacentHTML('beforeend', createEventCard(eventData));
     });
 
-    const data = await res.json();
-    uploadedImageUrl = data.image_url;
-    console.log(data);
+    console.log('All cards added successfully');
+  } catch (e) {
+    console.error('Failed to load events:', e);
+    document.getElementById('eventsContainer').innerHTML =
+      '<p class="col-span-full text-center text-red-500">Error loading events</p>';
+  }
 });
 
 
-// Drag and drop for image
-imageDropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    imageDropZone.classList.add('border-indigo-400');
-});
-
-imageDropZone.addEventListener('dragleave', () => {
-    imageDropZone.classList.remove('border-indigo-400');
-});
-
-imageDropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    imageDropZone.classList.remove('border-indigo-400');
-
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-        imageInput.files = e.dataTransfer.files;
-        imageDropZone.querySelector('p').textContent = `Selected: ${file.name}`;
+async function add_card(){
+  try{
+    const res=await fetch("http://127.0.0.1:5000/event/add_card",{
+      method:"GET",
+    })
+    if(!res.ok){
+      throw new Error("Problem in retrieving info from db");
     }
-});
+    const data=await res.json();
+    console.log('Success:', data);
+    return data;
+
+  }catch(e){
+    console.error('Error:',e);
+  }
+}
+
+
+function createEventCard(eventData) {
+  return `
+    <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition">
+      <span class="inline-block mb-3 px-3 py-1 text-sm rounded-full bg-pink-100 text-pink-600">
+        ${eventData.tag || 'General'}
+      </span>
+
+      <h3 class="text-xl font-semibold mb-2">
+        ${eventData.username}
+      </h3>
+
+      <p class="text-gray-600 text-sm mb-4">
+        ${eventData.description}
+      </p>
+
+      <div class="text-sm text-gray-500 space-y-1 mb-4">
+        <p>📅 ${eventData.start_date}</p>
+        <p>⏰ ${eventData.start_time} – ${eventData.end_time}</p>
+        <p>📍 ${eventData.venue}</p>
+      </div>
+
+      <a href="/event/${eventData.id}"
+         class="inline-block mt-2 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 transition">
+        View Details
+      </a>
+    </div>
+  `;
+}

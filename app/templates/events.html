@@ -5,7 +5,7 @@
     <title>Events</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-    <script src="../static/js/main.js" defer></script>
+    <script src="../static/js/event.js" defer></script>
     <link rel="stylesheet" href="../static/css/style2.css">
 
 </head>
@@ -61,66 +61,22 @@
   </div>
 
   <!-- Upcoming Events Section -->
-<section class="mt-16 px-10">
-  <h2 class="text-3xl font-semibold mb-8 text-gray-800">
-    Upcoming Events
-  </h2>
+<section class="p-8 bg-gray-50 min-h-screen">
+  <div class="max-w-7xl mx-auto">
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-    <!-- Event Card -->
-    <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-      <span class="inline-block mb-3 px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-600">
-        Technical
-      </span>
-
-      <h3 class="text-xl font-semibold mb-2">AI & ML Workshop</h3>
-
-      <p class="text-gray-600 text-sm mb-4">
-        Hands-on workshop covering basics of Machine Learning and real-world use cases.
-      </p>
-
-      <div class="card text-sm text-gray-500 space-y-1 mb-4">
-        <p class="date">📅 12 Feb 2026</p>
-        <p class="time">⏰ 10:00 AM – 1:00 PM</p>
-        <p class="venue">📍 Seminar Hall A</p>
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-800">Upcoming Events</h2>
       </div>
 
-      <a href="/event/1"
-         class="inline-block mt-2 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 transition">
-        View Details
-      </a>
-    </div>
+    <div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-    <!-- Duplicate Card -->
-    <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-      <span class="inline-block mb-3 px-3 py-1 text-sm rounded-full bg-pink-100 text-pink-600">
-        Cultural
-      </span>
-
-      <h3 class="text-xl font-semibold mb-2">Battle of Bands</h3>
-
-      <p class="text-gray-600 text-sm mb-4">
-        Show your musical talent and compete with the best bands on campus.
+      <p class="col-span-full text-center text-gray-500 animate-pulse">
+        Fetching events from the database...
       </p>
 
-      <div class="text-sm text-gray-500 space-y-1 mb-4">
-        <p class="date">📅 15 Feb 2026</p>
-        <p class="time">⏰ 5:00 PM – 8:00 PM</p>
-        <p class="venue">📍 Open Auditorium</p>
-      </div>
-
-      <a href="/event/2"
-         class="inline-block mt-2 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 transition">
-        View Details
-      </a>
     </div>
-
-    <!-- Add more cards as needed -->
-
   </div>
 </section>
-
 
   <script>
     let currentIndex = 0;

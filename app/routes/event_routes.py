@@ -83,3 +83,21 @@ def upload_image():
     return jsonify({
         "image_url": image_url
     }), 201
+
+@event_bp.route('/add_card', methods=['GET', 'OPTIONS'])
+@cross_origin(origins=["http://localhost:63342"])
+def add_card():
+    connection=None;
+    try:
+        connection = get_sql_connection()
+        result=event_dao.eventcard(connection)
+        return jsonify(result), 200
+    except Exception as e:
+        traceback.print_tb(e.__traceback__)
+        return jsonify({
+            "error": "Event retrieval failed",
+            "details": str(e)
+        }), 500
+    finally:
+        if connection:
+            connection.close()

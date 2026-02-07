@@ -52,30 +52,30 @@ function createEventCard(eventData) {
     <div class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
       
       <!-- Image Header (if available) -->
-      ${eventData.image ? `
-        <div class="relative h-48 overflow-hidden">
-          <img src="${eventData.image}" 
-               alt="${eventData.username}" 
-               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-          
-          <!-- Tag Badge -->
-          <span class="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm text-pink-600 shadow-lg">
-            ${eventData.tag || 'General'}
-          </span>
-          
-          <!-- Fee Badge -->
-          ${eventData.fee > 0 ? `
-            <span class="absolute top-3 right-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
-              ₹${eventData.fee}
-            </span>
-          ` : `
-            <span class="absolute top-3 right-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
-              FREE
-            </span>
-          `}
-        </div>
-      ` : `
+      ${eventData.image_url ? `
+  <div class="relative h-48 overflow-hidden">
+    <img src="${eventData.image_url}" 
+         alt="${eventData.username}" 
+         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+    
+    <!-- Tag Badge -->
+    <span class="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm text-pink-600 shadow-lg">
+      ${eventData.tag || 'General'}
+    </span>
+    
+    <!-- Fee Badge -->
+    ${eventData.fee > 0 ? `
+      <span class="absolute top-3 right-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
+        ₹${eventData.fee}
+      </span>
+    ` : `
+      <span class="absolute top-3 right-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
+        FREE
+      </span>
+    `}
+  </div>
+` : `
         <!-- Gradient Header (no image) -->
         <div class="relative h-32 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
           <div class="absolute inset-0 opacity-20">

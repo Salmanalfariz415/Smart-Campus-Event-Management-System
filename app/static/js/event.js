@@ -47,32 +47,146 @@ async function add_card(){
   }
 }
 
-
 function createEventCard(eventData) {
   return `
-    <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-xl transition">
-      <span class="inline-block mb-3 px-3 py-1 text-sm rounded-full bg-pink-100 text-pink-600">
-        ${eventData.tag || 'General'}
-      </span>
+    <div class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+      
+      <!-- Image Header (if available) -->
+      ${eventData.image ? `
+        <div class="relative h-48 overflow-hidden">
+          <img src="${eventData.image}" 
+               alt="${eventData.username}" 
+               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+          
+          <!-- Tag Badge -->
+          <span class="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm text-pink-600 shadow-lg">
+            ${eventData.tag || 'General'}
+          </span>
+          
+          <!-- Fee Badge -->
+          ${eventData.fee > 0 ? `
+            <span class="absolute top-3 right-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
+              ₹${eventData.fee}
+            </span>
+          ` : `
+            <span class="absolute top-3 right-3 px-3 py-1 text-xs font-bold rounded-full bg-green-500 text-white shadow-lg">
+              FREE
+            </span>
+          `}
+        </div>
+      ` : `
+        <!-- Gradient Header (no image) -->
+        <div class="relative h-32 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-0 left-0 w-24 h-24 bg-white rounded-full -translate-x-12 -translate-y-12"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 bg-white rounded-full translate-x-16 translate-y-16"></div>
+          </div>
+          <div class="relative p-4 flex items-start justify-between">
+            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm text-pink-600 shadow-lg">
+              ${eventData.tag || 'General'}
+            </span>
+            ${eventData.fee > 0 ? `
+              <span class="px-3 py-1 text-xs font-bold rounded-full bg-white text-green-600 shadow-lg">
+                ₹${eventData.fee}
+              </span>
+            ` : `
+              <span class="px-3 py-1 text-xs font-bold rounded-full bg-white text-green-600 shadow-lg">
+                FREE
+              </span>
+            `}
+          </div>
+        </div>
+      `}
 
-      <h3 class="text-xl font-semibold mb-2">
-        ${eventData.username}
-      </h3>
+      <!-- Content Section -->
+      <div class="p-6">
+        
+        <!-- Organization -->
+        ${eventData.organization ? `
+          <div class="flex items-center gap-2 mb-3">
+            <div class="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+              ${eventData.organization.charAt(0).toUpperCase()}
+            </div>
+            <span class="text-sm text-gray-600 font-medium">${eventData.organization}</span>
+          </div>
+        ` : ''}
 
-      <p class="text-gray-600 text-sm mb-4">
-        ${eventData.description}
-      </p>
+        <!-- Event Title -->
+        <h3 class="text-xl font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2">
+          ${eventData.title}
+        </h3>
 
-      <div class="text-sm text-gray-500 space-y-1 mb-4">
-        <p>📅 ${eventData.start_date}</p>
-        <p>⏰ ${eventData.start_time} – ${eventData.end_time}</p>
-        <p>📍 ${eventData.venue}</p>
+        <!-- Description -->
+        <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+          ${eventData.description}
+        </p>
+
+        <!-- Event Details -->
+        <div class="space-y-2 mb-4">
+          
+          <!-- Date Range -->
+          <div class="flex items-start gap-2 text-sm">
+            <span class="text-blue-500 mt-0.5">📅</span>
+            <div>
+              <span class="text-gray-700 font-medium">
+                ${eventData.start_date}${eventData.end_date && eventData.end_date !== eventData.start_date ? ` - ${eventData.end_date}` : ''}
+              </span>
+            </div>
+          </div>
+
+          <!-- Time -->
+          <div class="flex items-start gap-2 text-sm">
+            <span class="text-purple-500 mt-0.5">⏰</span>
+            <span class="text-gray-700 font-medium">${eventData.start_time} – ${eventData.end_time}</span>
+          </div>
+
+          <!-- Venue -->
+          <div class="flex items-start gap-2 text-sm">
+            <span class="text-pink-500 mt-0.5">📍</span>
+            <span class="text-gray-700 font-medium">
+              ${eventData.venue}${eventData.building ? `, ${eventData.building}` : ''}
+            </span>
+          </div>
+
+          <!-- Capacity -->
+          ${eventData.capacity ? `
+            <div class="flex items-start gap-2 text-sm">
+              <span class="text-green-500 mt-0.5">👥</span>
+              <span class="text-gray-700 font-medium">Capacity: ${eventData.capacity} people</span>
+            </div>
+          ` : ''}
+
+        </div>
+
+        <!-- Info Pills -->
+        <div class="flex flex-wrap gap-2 mb-4">
+          ${eventData.reg ? `
+            <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-md">
+              Registration Required
+            </span>
+          ` : ''}
+          
+          ${eventData.website ? `
+            <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-md">
+              Website Available
+            </span>
+          ` : ''}
+          
+          ${eventData.contact ? `
+            <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-md">
+              Contact Info
+            </span>
+          ` : ''}
+        </div>
+
+        <!-- Action Button -->
+        <a href="/event/${eventData.id}"
+           class="block w-full text-center px-5 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transform hover:scale-[1.02] transition-all shadow-sm hover:shadow-md">
+          View Full Details →
+        </a>
+
       </div>
-
-      <a href="/event/${eventData.id}"
-         class="inline-block mt-2 px-5 py-2 rounded-lg bg-blue-600 text-white text-sm hover:bg-blue-700 transition">
-        View Details
-      </a>
     </div>
   `;
 }

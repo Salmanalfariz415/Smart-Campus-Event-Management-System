@@ -4,6 +4,8 @@ import app.dao.event_dao as event_dao
 import traceback
 from flask_cors import cross_origin
 from werkzeug.utils import secure_filename
+from app.supabase_client import supabase
+
 import os, uuid
 
 
@@ -61,7 +63,6 @@ def submit():
 @event_bp.route('/image_upload', methods=['POST', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:63342"])
 def upload_image():
-    UPLOAD_FOLDER = r"C:\Users\Salman AL Fariz\PyCharmMiscProject\app\static\uploads"
 
     if 'image' not in request.files:
         return jsonify({"error": "No image provided"}), 400
@@ -71,17 +72,29 @@ def upload_image():
     if file.filename == '':
         return jsonify({"error": "Empty filename"}), 400
 
-    # Secure + unique filename
+    # Generate secure + unique filename
     ext = os.path.splitext(file.filename)[1]
-    filename = f"{uuid.uuid4()}{ext}"
+    filename = f"events/{uuid.uuid4()}{ext}"
 
-    save_path = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(save_path)
+    file_bytes = file.read()
 
-    image_url = f"/app/static/uploads/{filename}"
+    # Upload to Supabase Storage
+    response = supabase.storage.from_("event-images").upload(
+        filename,
+        file_bytes,
+        {
+            "content-type": file.content_type
+        }
+    )
+
+    if response.get("error"):
+        return jsonify({"error": response["error"]["message"]}), 500
+
+    # Get public URL
+    public_url = supabase.storage.from_("event-images").get_public_url(filename)
 
     return jsonify({
-        "image_url": image_url
+        "image_url": public_url
     }), 201
 
 @event_bp.route('/add_card', methods=['GET', 'OPTIONS'])

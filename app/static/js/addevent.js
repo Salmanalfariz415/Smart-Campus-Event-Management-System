@@ -103,17 +103,25 @@ imageInput.addEventListener('change', async (e) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    const res = await fetch('http://localhost:5000/event/image_upload', {
-        method: 'POST',
-        body: formData
-    });
+    try {
+        const res = await fetch('http://localhost:5000/event/image_upload', {
+            method: 'POST',
+            body: formData
+        });
 
-    const data = await res.json();
-    uploadedImageUrl = data.image_url;
-    console.log(data);
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'Upload failed');
+        }
+        const data = await res.json();
+        uploadedImageUrl = data.image_url;
+
+        console.log('Uploaded image URL:', uploadedImageUrl);
+    } catch (err) {
+        console.error(err.message);
+        imageDropZone.querySelector('p').textContent = 'Upload failed';
+    }
 });
-
-
 // Drag and drop for image
 imageDropZone.addEventListener('dragover', (e) => {
     e.preventDefault();

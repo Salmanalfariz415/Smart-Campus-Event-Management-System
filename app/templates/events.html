@@ -75,6 +75,12 @@
       </p>
 
     </div>
+    <button
+      class="event_button"
+      data-title="Tech Fest 2026"
+      data-desc="A full-day tech event with workshops">
+      View Details
+    </button>
   </div>
 </section>
 
@@ -97,5 +103,14 @@
       updateSlider();
     }
   </script>
+   <!-- Overlay -->
+  <div id="eventOverlay"
+    class="hidden fixed inset-0 bg-black/60 z-[9998] flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg relative">
+      <button id="closeOverlay" class="absolute top-2 right-3">✕</button>
+      <h2 id="overlayTitle" class="text-xl mb-2"></h2>
+      <p id="overlayDesc"></p>
+    </div>
+  </div>
 </body>
 </html>

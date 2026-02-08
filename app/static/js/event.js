@@ -27,6 +27,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('eventsContainer').innerHTML =
       '<p class="col-span-full text-center text-red-500">Error loading events</p>';
   }
+
+  const buttons = document.querySelectorAll(".event_button");
+  const overlay = document.getElementById("eventOverlay");
+  const closeBtn = document.getElementById("closeOverlay");
+  const overlayTitle = document.getElementById("overlayTitle");
+  const overlayDesc = document.getElementById("overlayDesc");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+
+      const card = btn.closest(".event-card");
+      if (!card) return;
+
+      overlayTitle.textContent =
+        card.querySelector(".event-title")?.textContent || "";
+
+      overlayDesc.textContent =
+        card.querySelector(".event-desc")?.textContent || "";
+
+      overlay.classList.remove("hidden");
+    });
+  });
+
+  closeBtn.addEventListener("click", () => {
+    overlay.classList.add("hidden");
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.classList.add("hidden");
+    }
+  });
 });
 
 
@@ -181,10 +213,10 @@ function createEventCard(eventData) {
         </div>
 
         <!-- Action Button -->
-        <a href="/event/${eventData.id}"
-           class="block w-full text-center px-5 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transform hover:scale-[1.02] transition-all shadow-sm hover:shadow-md">
+        <button
+           class="event_button block w-full text-center px-5 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transform hover:scale-[1.02] transition-all shadow-sm hover:shadow-md">
           View Full Details →
-        </a>
+        </button>
 
       </div>
     </div>

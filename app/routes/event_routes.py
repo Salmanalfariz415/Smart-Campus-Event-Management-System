@@ -63,39 +63,33 @@ def submit():
 @event_bp.route('/image_upload', methods=['POST', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:63342"])
 def upload_image():
+    try:
+        if 'image' not in request.files:
+            return jsonify({"error": "No image provided"}), 400
 
-    if 'image' not in request.files:
-        return jsonify({"error": "No image provided"}), 400
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({"error": "Empty filename"}), 400
 
-    file = request.files['image']
+        ext = os.path.splitext(file.filename)[1]
+        filename = f"events/{uuid.uuid4()}{ext}"
 
-    if file.filename == '':
-        return jsonify({"error": "Empty filename"}), 400
+        file_bytes = file.read()
 
-    # Generate secure + unique filename
-    ext = os.path.splitext(file.filename)[1]
-    filename = f"events/{uuid.uuid4()}{ext}"
+        response = supabase.storage.from_("event-images").upload(
+            filename,
+            file_bytes,
+            {"content-type": file.content_type}
+        )
 
-    file_bytes = file.read()
+        public_url = supabase.storage.from_("event-images").get_public_url(filename)
 
-    # Upload to Supabase Storage
-    response = supabase.storage.from_("event-images").upload(
-        filename,
-        file_bytes,
-        {
-            "content-type": file.content_type
-        }
-    )
+        return jsonify({"image_url": public_url}), 201
 
-    if response.get("error"):
-        return jsonify({"error": response["error"]["message"]}), 500
+    except Exception as e:
+        print("UPLOAD ERROR:", e)
+        return jsonify({"error": str(e)}), 500
 
-    # Get public URL
-    public_url = supabase.storage.from_("event-images").get_public_url(filename)
-
-    return jsonify({
-        "image_url": public_url
-    }), 201
 
 @event_bp.route('/add_card', methods=['GET', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:63342"])

@@ -113,7 +113,15 @@ imageInput.addEventListener('change', async (e) => {
             const err = await res.json();
             throw new Error(err.error || 'Upload failed');
         }
-        const data = await res.json();
+        const text = await res.text();
+        console.log("RAW RESPONSE:", text);
+
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          throw new Error("Server did not return JSON");
+        }
         uploadedImageUrl = data.image_url;
 
         console.log('Uploaded image URL:', uploadedImageUrl);

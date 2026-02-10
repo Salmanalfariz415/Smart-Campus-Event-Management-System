@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Events</title>
@@ -7,104 +8,104 @@
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
     <script src="../static/js/event.js" defer></script>
     <link rel="stylesheet" href="../static/css/style2.css">
-
 </head>
-<body class="bg-[#90323d] overflow-x-hidden">
-<!--nav bar-->
-  <div class="nav grid grid-cols-7 fixed top-0 left-0 w-full h-16 bg-black text-white z-50">
-    <div id="logo" class="col-span-1 bg-black flex justify-center items-center">
+
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 overflow-x-hidden">
+    <!-- Navigation Bar -->
+    <div class="nav grid grid-cols-7 fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-slate-900 to-indigo-950 text-white shadow-lg z-50">
+        <div id="logo" class="col-span-1 bg-gradient-to-br from-indigo-600 to-purple-600 flex justify-center items-center">
             <img src="../static/images/logo.png" class="h-9 w-30">
+        </div>
+        <div class="col-span-1"></div>
+        <div class="col-span-1"></div>
+        <div></div>
+        <a class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold" href="./home.html">Home</a>
+        <h1 class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold cursor-pointer">Categories</h1>
+        <a href="./addEvent.html" class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold">Organizer Access</a>
     </div>
-    <div class="col-span-1"></div>
-    <div class="col-span-1"></div>
-    <div></div>
-    <a class="col-span-1 pt-5" href="./home.html">Home</a>
-    <h1 class="col-span-1 pt-5">Categories</h1>
-    <a href="./addEvent.html" class="col-span-1 pt-5">Organizer Access</a>
 
-  </div>
-<!--search bar-->
-  <div class="grid grid-cols-3 items-center search relative mt-16 h-28 w-full bg-white pt-3">
-    <button class="mx-10 btn col-span-1 h-10 mt-5">Filter</button>
-    <div class="col-span-2 flex justify-start item-center">
-      <div class="form-control mx-5">
-      <input class="text-black input input-alt h-16 rounded-xl px-2 border-2 border-red-400 w-[35rem]" placeholder="Search For Events" required="" type="text">
-      <span class="input-border input-border-alt"></span>
+    <!-- Search Bar -->
+    <div class="grid grid-cols-3 items-center search relative mt-16 h-28 w-full bg-gradient-to-r from-slate-50 to-indigo-50 pt-3 shadow-md">
+        <button class="mx-10 btn col-span-1 h-10 mt-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg">Filter</button>
+        <div class="col-span-2 flex justify-start item-center">
+            <div class="form-control mx-5">
+                <input class="text-black input input-alt h-16 rounded-xl px-2 border-2 border-indigo-400 w-[35rem] focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all duration-300" placeholder="Search For Events" required="" type="text">
+                <span class="input-border input-border-alt"></span>
+            </div>
+            <button class="submit bg-gradient-to-r from-cyan-500 to-teal-500 h-10 w-24 rounded-xl text-xl text-white font-bold mt-3 hover:from-cyan-600 hover:to-teal-600 shadow-md hover:shadow-lg transition-all duration-300">Submit</button>
+        </div>
     </div>
-    <button class="submit bg-green-600 h-10 w-24 rounded-xl text-xl text-white font-bold mt-3">Submit</button>
+
+    <!-- Slider Section -->
+    <div class="section1 w-full overflow-hidden relative bg-gradient-to-br from-slate-100 to-indigo-100 h-[35rem] pt-4">
+        <div id="slider" class="flex transition-transform duration-500 ease-in-out">
+            <div class="min-w-full h-[33rem] px-4">
+                <div class="w-full h-full flex items-center justify-center text-4xl text-white bg-gradient-to-br from-cyan-500 via-blue-600 to-indigo-700 rounded-xl shadow-2xl">
+                    Tech Fest
+                </div>
+            </div>
+
+            <div class="min-w-full h-[33rem] px-4">
+                <div class="w-full h-full flex items-center justify-center text-4xl text-white bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-700 rounded-xl shadow-2xl">
+                    Cultural Night
+                </div>
+            </div>
+
+            <div class="min-w-full h-[33rem] px-4">
+                <div class="w-full h-full flex items-center justify-center text-4xl text-white bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 rounded-xl shadow-2xl">
+                    Hackathon
+                </div>
+            </div>
+        </div>
+
+        <button onclick="prev()" class="absolute left-5 top-1/2 -translate-y-1/2 text-4xl text-white bg-black/30 hover:bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:scale-110 transition-all duration-300 backdrop-blur-sm">❮</button>
+        <button onclick="next()" class="absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-white bg-black/30 hover:bg-black/50 rounded-full w-14 h-14 flex items-center justify-center hover:scale-110 transition-all duration-300 backdrop-blur-sm">❯</button>
     </div>
-  </div>
 
-  <div class="section1 w-full overflow-hidden relative bg-white h-[35rem] pt-4">
+    <!-- Upcoming Events Section -->
+    <section class="p-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 min-h-screen">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Upcoming Events</h2>
+            </div>
 
-    <div id="slider" class="flex transition-transform duration-500 ease-in-out">
-  <div class="min-w-full h-[33rem] px-4">
-    <div class="w-full h-full flex items-center justify-center text-4xl text-white bg-blue-500 rounded-xl">
-      Tech Fest
+            <div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <p class="col-span-full text-center text-indigo-600 animate-pulse font-semibold">
+                    Fetching events from the database...
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slider Script -->
+    <script>
+        let currentIndex = 0;
+        const slider = document.getElementById('slider');
+        const totalSlides = slider.children.length;
+
+        function updateSlider() {
+            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+        }
+
+        function next() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateSlider();
+        }
+
+        function prev() {
+            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+            updateSlider();
+        }
+    </script>
+
+    <!-- Event Overlay -->
+    <div id="eventOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] flex items-center justify-center">
+        <div class="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-lg relative shadow-2xl">
+            <button id="closeOverlay" class="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-2xl font-bold transition-colors duration-300">✕</button>
+            <h2 id="overlayTitle" class="text-xl mb-2 font-bold text-indigo-900"></h2>
+            <p id="overlayDesc"></p>
+        </div>
     </div>
-  </div>
-
-  <div class="min-w-full h-[33rem] px-4">
-    <div class="w-full h-full flex items-center justify-center text-4xl text-white bg-purple-500 rounded-xl">
-      Cultural Night
-    </div>
-  </div>
-
-  <div class="min-w-full h-[33rem] px-4">
-    <div class="w-full h-full flex items-center justify-center text-4xl text-white bg-emerald-500 rounded-xl">
-      Hackathon
-    </div>
-  </div>
-</div>
-    <button onclick="prev()" class="absolute left-5 top-1/2 -translate-y-1/2 text-4xl text-white hover:scale-110 transition-transform">❮</button>
-    <button onclick="next()" class="absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-white hover:scale-110 transition-transform">❯</button>
-  </div>
-
-  <!-- Upcoming Events Section -->
-<section class="p-8 bg-gray-50 min-h-screen">
-  <div class="max-w-7xl mx-auto">
-
-    <div class="flex justify-between items-center mb-8">
-      <h2 class="text-3xl font-bold text-gray-800">Upcoming Events</h2>
-      </div>
-
-    <div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-      <p class="col-span-full text-center text-gray-500 animate-pulse">
-        Fetching events from the database...
-      </p>
-
-    </div>
-  </div>
-</section>
-
-  <script>
-    let currentIndex = 0;
-    const slider = document.getElementById('slider');
-    const totalSlides = slider.children.length;
-
-    function updateSlider() {
-      slider.style.transform = `translateX(-${currentIndex * 100}%)`;
-    }
-
-    function next() {
-      currentIndex = (currentIndex + 1) % totalSlides;
-      updateSlider();
-    }
-
-    function prev() {
-      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-      updateSlider();
-    }
-  </script>
-   <!-- Overlay -->
-  <div id="eventOverlay"
-    class="hidden fixed inset-0 bg-black/60 z-[9998] flex items-center justify-center">
-    <div class="bg-white p-6 rounded-lg relative">
-      <button id="closeOverlay" class="absolute top-2 right-3">✕</button>
-      <h2 id="overlayTitle" class="text-xl mb-2"></h2>
-      <p id="overlayDesc"></p>
-    </div>
-  </div>
 </body>
+
 </html>

@@ -2,8 +2,8 @@
  width: 4.5em;
  height: 2em;
  margin: 0.5em;
- background: black;
- color: #853c3c;
+ background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+ color: white;
  border: none;
  border-radius: 0.9em;
  font-size: 20px;
@@ -12,15 +12,18 @@
  position: relative;
  z-index: 1;
  overflow: hidden;
+ box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
 }
 
 .btn:hover {
- color: black;
+ color: white;
+ transform: translateY(-2px);
+ box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
 }
 
 .btn:after {
  content: "";
- background: #853c3c;
+ background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
  position: absolute;
  z-index: -1;
  left: -20%;
@@ -82,7 +85,7 @@
 
 .input-border-alt {
   height: 3px;
-  background: linear-gradient(90deg, #FF6464 0%, #FFBF59 50%, #47C9FF 100%);
+  background: linear-gradient(90deg, #a855f7 0%, #6366f1 50%, #06b6d4 100%);
   transition: width 0.4s cubic-bezier(0.42, 0, 0.58, 1.00);
 }
 
@@ -98,17 +101,19 @@
   width: 150px;
   height: 60px;
   border-radius: 50px;
-  box-shadow: 0 10px 30px -6px rgba(18, 227, 10, 0.5);
+  box-shadow: 0 10px 30px -6px rgba(6, 182, 212, 0.6);
   outline: none;
   cursor: pointer;
   border: none;
   font-size: 24px;
   color: white;
+  background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%);
 }
 
 .submit:hover {
   transform: translateY(3px);
-  box-shadow: none;
+  box-shadow: 0 5px 15px -3px rgba(6, 182, 212, 0.4);
+  background: linear-gradient(135deg, #0891b2 0%, #0d9488 100%);
 }
 
 .submit:active {

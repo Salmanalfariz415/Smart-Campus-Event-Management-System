@@ -12,7 +12,7 @@ import os, uuid
 event_bp = Blueprint('event', __name__, url_prefix='/event')
 
 @event_bp.route('/submit', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342"])
+@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
 def submit():
     connection = None
     try:
@@ -61,7 +61,7 @@ def submit():
             connection.close()
 
 @event_bp.route('/image_upload', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342"])
+@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
 def upload_image():
     try:
         if 'image' not in request.files:
@@ -92,9 +92,9 @@ def upload_image():
 
 
 @event_bp.route('/add_card', methods=['GET', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342"])
+@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
 def add_card():
-    connection=None;
+    connection=None
     try:
         connection = get_sql_connection()
         result=event_dao.eventcard(connection)

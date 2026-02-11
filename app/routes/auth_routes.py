@@ -56,3 +56,43 @@ def login():
         if connection:
             connection.close()
 
+@auth_bp.route('/register-organizer', methods=['POST', 'OPTIONS'])
+@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+def register_organizer():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    connection = None
+    try:
+        connection = get_sql_connection()
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['org_name', 'org_type', 'contact_name', 'contact_position', 
+                          'email', 'phone', 'username', 'password']
+        
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+        
+        # Check password confirmation
+        if data.get('password') != data.get('confirm_password'):
+            return jsonify({"error": "Passwords do not match"}), 400
+            
+        result = auth_dao.register_organizer(connection, data)
+        
+        return jsonify({
+            "message": "Organizer registration successful",
+            "user_id": result['user_id'],
+            "organizer_id": result['organizer_id']
+        }), 201
+
+    except Exception as e:
+        print("=== ORGANIZER REGISTRATION ERROR ===")
+        print(str(e))
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+    finally:
+        if connection:
+            connection.close()

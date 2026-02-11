@@ -19,6 +19,8 @@ def submit():
         data = request.get_json()
 
         username = data.get('username')
+        event_type = data.get('event_type')  # scholastic or non-scholastic
+        event_sub_type = data.get('event_sub_type')  # specific category
         description = data.get('description')
         organization = data.get('organization')
         start_date = data.get('start_date')
@@ -38,7 +40,7 @@ def submit():
         connection = get_sql_connection()
 
         event_id = event_dao.submitl(
-            connection, username, description, organization,
+            connection, username, event_type, event_sub_type, description, organization,
             start_date, end_date, start_time, end_time,
             venue, building, capacity, fee, reg,
             img, contact, website, tag

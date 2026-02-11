@@ -1,6 +1,12 @@
 // Handle event type selection
 const eventRadios = document.querySelectorAll('input[name="eventType"]');
 
+// Initialize dropdown as disabled
+document.addEventListener('DOMContentLoaded', () => {
+    const dropdown = document.getElementById('eventSubType');
+    dropdown.disabled = true;
+});
+
 eventRadios.forEach(radio => {
     radio.addEventListener('click', (e) => {
         const selectedValue = e.target.value;
@@ -14,11 +20,57 @@ eventRadios.forEach(radio => {
 });
 
 function handleConcertSelection() {
-    console.log("Rock on! 🎸 Concert logic triggered.");
+    console.log("Rock on! 🎸 Non-Scholastic event selected.");
+    populateEventSubTypes('non-scholastic');
 }
 
 function handleHackathonSelection() {
-    console.log("Happy Hacking! 💻 Hackathon logic triggered.");
+    console.log("Happy Hacking! 💻 Scholastic event selected.");
+    populateEventSubTypes('scholastic');
+}
+
+function populateEventSubTypes(type) {
+    const dropdown = document.getElementById('eventSubType');
+    dropdown.innerHTML = ''; // Clear existing options
+    
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select event category';
+    dropdown.appendChild(defaultOption);
+    
+    let options = [];
+    
+    if (type === 'scholastic') {
+        options = [
+            'Academic Conference',
+            'Workshop',
+            'Seminar',
+            'Hackathon',
+            'Competition',
+            'Academic Fair',
+            'Guest Lecture'
+        ];
+    } else if (type === 'non-scholastic') {
+        options = [
+            'Concert',
+            'Cultural Show',
+            'Sports Event',
+            'Festival',
+            'Party',
+            'Art Exhibition',
+            'Community Service'
+        ];
+    }
+    
+    options.forEach(option => {
+        const optionElement = document.createElement('option');
+        optionElement.value = option.toLowerCase().replace(/\s+/g, '_');
+        optionElement.textContent = option;
+        dropdown.appendChild(optionElement);
+    });
+    
+    // Enable the dropdown
+    dropdown.disabled = false;
 }
 
 // Handle form submission
@@ -26,6 +78,8 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     // Get form values WHEN SUBMITTED (not when page loads)
+    const eventType = document.querySelector('input[name="eventType"]:checked')?.value;
+    const eventSubType = document.getElementById("eventSubType").value;
     const eventName = document.getElementById("eventName").value;
     const eventDesc = document.getElementById("description").value;
     const eventOrg = document.getElementById("organizer").value;
@@ -41,6 +95,17 @@ document.querySelector('form').addEventListener('submit', async (e) => {
     const contactEmail = document.getElementById("contactEmail").value;
     const website = document.getElementById("website").value;
     const tags = document.getElementById("tags").value;
+    
+    // Validation
+    if (!eventType) {
+        alert('Please select an event type (Scholastic or Non-Scholastic)');
+        return;
+    }
+    
+    if (!eventSubType) {
+        alert('Please select an event category');
+        return;
+    }
 
     console.log('Submitting form data...');
 
@@ -50,6 +115,8 @@ document.querySelector('form').addEventListener('submit', async (e) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 username: eventName,
+                event_type: eventType,
+                event_sub_type: eventSubType,
                 description: eventDesc,
                 organization: eventOrg,
                 start_date: startDate,

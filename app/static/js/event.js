@@ -91,9 +91,9 @@ function createEventCard(eventData) {
          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
     <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
     
-    <!-- Tag Badge -->
-    <span class="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm text-pink-600 shadow-lg">
-      ${eventData.tag || 'General'}
+    <!-- Event Type Badge -->
+    <span class="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full ${eventData.event_type === 'hackathon' ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'} shadow-lg">
+      ${eventData.event_type === 'hackathon' ? '📚 Scholastic' : '🎉 Non-Scholastic'}
     </span>
     
     <!-- Fee Badge -->
@@ -109,14 +109,14 @@ function createEventCard(eventData) {
   </div>
 ` : `
         <!-- Gradient Header (no image) -->
-        <div class="relative h-32 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+        <div class="relative h-32 ${eventData.event_type === 'hackathon' ? 'bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500'}">
           <div class="absolute inset-0 opacity-20">
             <div class="absolute top-0 left-0 w-24 h-24 bg-white rounded-full -translate-x-12 -translate-y-12"></div>
             <div class="absolute bottom-0 right-0 w-32 h-32 bg-white rounded-full translate-x-16 translate-y-16"></div>
           </div>
           <div class="relative p-4 flex items-start justify-between">
-            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm text-pink-600 shadow-lg">
-              ${eventData.tag || 'General'}
+            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-white/95 backdrop-blur-sm ${eventData.event_type === 'hackathon' ? 'text-blue-600' : 'text-purple-600'} shadow-lg">
+              ${eventData.event_type === 'hackathon' ? '📚 Scholastic' : '🎉 Non-Scholastic'}
             </span>
             ${eventData.fee > 0 ? `
               <span class="px-3 py-1 text-xs font-bold rounded-full bg-white text-green-600 shadow-lg">
@@ -142,6 +142,13 @@ function createEventCard(eventData) {
             </div>
             <span class="text-sm text-gray-600 font-medium">${eventData.organization}</span>
           </div>
+        ` : ''}
+
+        <!-- Event Category Badge -->
+        ${eventData.event_category ? `
+          <span class="inline-block px-2 py-1 mb-2 text-xs font-medium rounded-md ${eventData.event_type === 'hackathon' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}">
+            ${eventData.event_category.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+          </span>
         ` : ''}
 
         <!-- Event Title -->
@@ -193,6 +200,12 @@ function createEventCard(eventData) {
 
         <!-- Info Pills -->
         <div class="flex flex-wrap gap-2 mb-4">
+          ${eventData.tag ? `
+            <span class="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-semibold rounded-md">
+              ${eventData.tag}
+            </span>
+          ` : ''}
+          
           ${eventData.reg ? `
             <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-md">
               Registration Required

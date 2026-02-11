@@ -101,6 +101,7 @@ def register_organizer(connection, org_data):
     try:
         cursor = connection.cursor()
         
+
         user_id = register_user(
             connection, 
             org_data['email'], 

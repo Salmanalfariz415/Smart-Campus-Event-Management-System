@@ -69,15 +69,12 @@ function populateEventSubTypes(type) {
         dropdown.appendChild(optionElement);
     });
     
-    // Enable the dropdown
     dropdown.disabled = false;
 }
 
-// Handle form submission
 document.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    // Get form values WHEN SUBMITTED (not when page loads)
     const eventType = document.querySelector('input[name="eventType"]:checked')?.value;
     const eventSubType = document.getElementById("eventSubType").value;
     const eventName = document.getElementById("eventName").value;

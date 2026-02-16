@@ -72,7 +72,6 @@ if(submit_organizer){
             contact_position: document.getElementById("contact_position").value,
             email: document.getElementById("email").value,
             phone: document.getElementById("phone").value,
-            username: document.getElementById("username").value,
             password: document.getElementById("password").value,
             confirm_password: document.getElementById("confirm_password").value
         };
@@ -89,12 +88,22 @@ async function registerOrganizer(data){
             },
             body:JSON.stringify(data)
         }); 
+        
         if(!res.ok){
-            throw new Error("Problem in user.js");
+            const errorData = await res.json();
+            console.error('Registration failed:', errorData);
+            alert(`Registration failed: ${errorData.error || 'Unknown error'}`);
+            throw new Error(`HTTP ${res.status}: ${errorData.error || 'Registration failed'}`);
         }
+        
         const responseData = await res.json();
+        console.log('Registration successful:', responseData);
+        alert('Organizer registration successful!');
         return responseData;
     }catch(e){
-        console.log(e);
+        console.error('Registration error:', e);
+        if (!e.message.includes('HTTP')) {
+            alert('Registration failed. Please check your internet connection and try again.');
+        }
     }
 }

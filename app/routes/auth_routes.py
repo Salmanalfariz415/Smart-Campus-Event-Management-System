@@ -56,7 +56,7 @@ def login():
         if connection:
             connection.close()
 
-@auth_bp.route('/register-organizer', methods=['POST', 'OPTIONS'])
+@auth_bp.route('/register_organizer', methods=['POST', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
 def register_organizer():
     if request.method == 'OPTIONS':
@@ -69,7 +69,7 @@ def register_organizer():
         
         # Validate required fields
         required_fields = ['org_name', 'org_type', 'contact_name', 'contact_position', 
-                          'email', 'phone', 'username', 'password']
+                          'email', 'phone', 'password']
         
         for field in required_fields:
             if not data.get(field):

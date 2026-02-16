@@ -1,24 +1,26 @@
 
+let eventsData = []; // Global variable to store events
+
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('DOM loaded, starting fetch...');
 
   try {
-    const events = await add_card();
-    console.log('Events received:', events); // Check what you got
-    console.log('Number of events:', events?.length);
+    eventsData = await add_card();
+    console.log('Events received:', eventsData); // Check what you got
+    console.log('Number of events:', eventsData?.length);
 
     const container = document.getElementById('eventsContainer');
     console.log('Container found:', container); // Make sure container exists
 
-    if (!events || events.length === 0) {
+    if (!eventsData || eventsData.length === 0) {
       console.warn('No events to display');
       container.innerHTML = '<p class="col-span-full text-center">No events available</p>';
       return;
     }
 
-    events.forEach((eventData, index) => {
+    eventsData.forEach((eventData, index) => {
       console.log(`Adding card ${index + 1}:`, eventData);
-      container.insertAdjacentHTML('beforeend', createEventCard(eventData));
+      container.insertAdjacentHTML('beforeend', createEventCard(eventData, index));
     });
 
     console.log('All cards added successfully');
@@ -36,16 +38,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   buttons.forEach(btn => {
     btn.addEventListener("click", () => {
+      const eventIndex = parseInt(btn.dataset.index);
+      const eventData = eventsData[eventIndex];
+      if (!eventData) return;
 
-      const card = btn.closest(".event-card");
-      if (!card) return;
-
-      overlayTitle.textContent =
-        card.querySelector(".event-title")?.textContent || "";
-
-      overlayDesc.textContent =
-        card.querySelector(".event-desc")?.textContent || "";
-
+      populateOverlay(eventData);
       overlay.classList.remove("hidden");
     });
   });
@@ -59,7 +56,147 @@ document.addEventListener('DOMContentLoaded', async () => {
       overlay.classList.add("hidden");
     }
   });
+
+  // Add event listeners for overlay buttons
+  document.getElementById("bookEventBtn").addEventListener("click", handleBooking);
+  document.getElementById("shareEventBtn").addEventListener("click", handleSharing);
 });
+
+// Function to populate overlay with event data
+function populateOverlay(eventData) {
+  // Header
+  document.getElementById("overlayTitle").textContent = eventData.title;
+  document.getElementById("overlayCategory").textContent = 
+    eventData.event_type === 'hackathon' ? '📚 Scholastic' : '🎉 Non-Scholastic';
+  document.getElementById("overlayFee").textContent = 
+    eventData.fee > 0 ? `₹${eventData.fee}` : 'FREE';
+    
+  // Update header gradient based on event type
+  const header = document.getElementById("overlayHeader");
+  header.className = eventData.event_type === 'hackathon' 
+    ? 'h-32 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 rounded-t-2xl relative overflow-hidden'
+    : 'h-32 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-t-2xl relative overflow-hidden';
+  
+  // Organization
+  if (eventData.organization) {
+    document.getElementById("overlayOrgIcon").textContent = 
+      eventData.organization.charAt(0).toUpperCase();
+    document.getElementById("overlayOrgName").textContent = eventData.organization;
+    document.getElementById("overlayOrganization").style.display = 'flex';
+  } else {
+    document.getElementById("overlayOrganization").style.display = 'none';
+  }
+  
+  // Description
+  document.getElementById("overlayDesc").textContent = eventData.description;
+  
+  // Date & Time
+  const dateText = eventData.end_date && eventData.end_date !== eventData.start_date 
+    ? `${eventData.start_date} - ${eventData.end_date}`
+    : eventData.start_date;
+  document.getElementById("overlayDate").textContent = dateText;
+  document.getElementById("overlayTime").textContent = `${eventData.start_time} – ${eventData.end_time}`;
+  
+  // Location
+  document.getElementById("overlayVenue").textContent = eventData.venue;
+  document.getElementById("overlayBuilding").textContent = eventData.building || '';
+  
+  // Capacity
+  if (eventData.capacity) {
+    document.getElementById("overlayCapacity").textContent = `${eventData.capacity} attendees`;
+    document.getElementById("overlayCapacitySection").style.display = 'block';
+  } else {
+    document.getElementById("overlayCapacitySection").style.display = 'none';
+  }
+  
+  // Registration
+  document.getElementById("overlayRegistration").textContent = 
+    eventData.reg ? 'Registration Required' : 'No Registration Required';
+  
+  // Tags
+  const tagsContainer = document.getElementById("overlayTags");
+  tagsContainer.innerHTML = '';
+  
+  if (eventData.tag) {
+    tagsContainer.innerHTML += `<span class="px-2 py-1 bg-pink-100 text-pink-700 text-xs font-semibold rounded-md">${eventData.tag}</span>`;
+  }
+  
+  if (eventData.event_category) {
+    tagsContainer.innerHTML += `<span class="px-2 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-md">${eventData.event_category.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`;
+  }
+  
+  if (tagsContainer.innerHTML === '') {
+    document.getElementById("overlayTagsSection").style.display = 'none';
+  } else {
+    document.getElementById("overlayTagsSection").style.display = 'block';
+  }
+  
+  // Contact & Website
+  if (eventData.contact) {
+    document.getElementById("overlayContact").href = `mailto:${eventData.contact}`;
+    document.getElementById("overlayContactSection").style.display = 'block';
+  } else {
+    document.getElementById("overlayContactSection").style.display = 'none';
+  }
+  
+  if (eventData.website) {
+    document.getElementById("overlayWebsite").href = eventData.website;
+    document.getElementById("overlayWebsiteSection").style.display = 'block';
+  } else {
+    document.getElementById("overlayWebsiteSection").style.display = 'none';
+  }
+  
+  // Store current event data for booking
+  window.currentEventData = eventData;
+}
+
+// Booking functionality
+function handleBooking() {
+  const eventData = window.currentEventData;
+  if (!eventData) return;
+  
+  if (eventData.website) {
+    // If there's a website, open it for registration
+    window.open(eventData.website, '_blank');
+  } else if (eventData.contact) {
+    // If there's contact info, open email client
+    window.location.href = `mailto:${eventData.contact}?subject=Registration for ${eventData.title}&body=Hi, I would like to register for the event "${eventData.title}" scheduled on ${eventData.start_date}.`;
+  } else {
+    // Generic booking confirmation
+    alert(`Booking initiated for "${eventData.title}"!\n\nPlease contact the organizer for further registration details.`);
+  }
+}
+
+// Sharing functionality
+function handleSharing() {
+  const eventData = window.currentEventData;
+  if (!eventData) return;
+  
+  const shareText = `Check out this event: ${eventData.title}\n📅 ${eventData.start_date}\n📍 ${eventData.venue}\n\n${eventData.description}`;
+  
+  if (navigator.share) {
+    // Use native sharing if available
+    navigator.share({
+      title: eventData.title,
+      text: shareText,
+      url: window.location.href
+    });
+  } else {
+    // Fallback to copying to clipboard
+    navigator.clipboard.writeText(shareText).then(() => {
+      alert('Event details copied to clipboard!');
+    }).catch(() => {
+      // Final fallback
+      const textArea = document.createElement('textarea');
+      textArea.value = shareText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Event details copied to clipboard!');
+    });
+  }
+};
 
 
 async function add_card(){
@@ -79,9 +216,9 @@ async function add_card(){
   }
 }
 
-function createEventCard(eventData) {
+function createEventCard(eventData, index) {
   return `
-    <div class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+    <div class="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 event-card">
       
       <!-- Image Header (if available) -->
       ${eventData.image_url ? `
@@ -152,12 +289,12 @@ function createEventCard(eventData) {
         ` : ''}
 
         <!-- Event Title -->
-        <h3 class="text-xl font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2">
+        <h3 class="event-title text-xl font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2">
           ${eventData.title}
         </h3>
 
         <!-- Description -->
-        <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+        <p class="event-desc text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
           ${eventData.description}
         </p>
 
@@ -227,7 +364,7 @@ function createEventCard(eventData) {
 
         <!-- Action Button -->
         <button
-           class="event_button block w-full text-center px-5 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transform hover:scale-[1.02] transition-all shadow-sm hover:shadow-md">
+           class="event_button block w-full text-center px-5 py-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transform hover:scale-[1.02] transition-all shadow-sm hover:shadow-md" data-index="${index}">
           View Full Details →
         </button>
 

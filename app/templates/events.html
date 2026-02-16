@@ -98,12 +98,109 @@
         }
     </script>
 
-    <!-- Event Overlay -->
-    <div id="eventOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] flex items-center justify-center">
-        <div class="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-lg relative shadow-2xl">
-            <button id="closeOverlay" class="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-2xl font-bold transition-colors duration-300">✕</button>
-            <h2 id="overlayTitle" class="text-xl mb-2 font-bold text-indigo-900"></h2>
-            <p id="overlayDesc"></p>
+    <!-- Enhanced Event Overlay -->
+    <div id="eventOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] flex items-center justify-center p-4">
+        <div class="bg-gradient-to-br from-white to-indigo-50 rounded-2xl relative shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <button id="closeOverlay" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl font-bold transition-colors duration-300 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">✕</button>
+            
+            <!-- Event Header -->
+            <div id="overlayHeader" class="h-32 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-t-2xl relative overflow-hidden">
+                <div class="absolute inset-0 opacity-20">
+                    <div class="absolute top-0 left-0 w-24 h-24 bg-white rounded-full -translate-x-12 -translate-y-12"></div>
+                    <div class="absolute bottom-0 right-0 w-32 h-32 bg-white rounded-full translate-x-16 translate-y-16"></div>
+                </div>
+                <div class="relative p-6 flex items-end justify-between">
+                    <div>
+                        <span id="overlayCategory" class="px-3 py-1 text-xs font-semibold rounded-full bg-white/95 text-purple-600 shadow-lg"></span>
+                        <h2 id="overlayTitle" class="text-2xl font-bold text-white mt-2 drop-shadow-lg"></h2>
+                    </div>
+                    <span id="overlayFee" class="px-3 py-1 text-sm font-bold rounded-full bg-white text-green-600 shadow-lg"></span>
+                </div>
+            </div>
+            
+            <!-- Event Content -->
+            <div class="p-6">
+                <!-- Organization -->
+                <div id="overlayOrganization" class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+                    <div id="overlayOrgIcon" class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold"></div>
+                    <div>
+                        <p class="text-sm text-gray-500">Organized by</p>
+                        <p id="overlayOrgName" class="font-semibold text-gray-800"></p>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">About This Event</h3>
+                    <p id="overlayDesc" class="text-gray-600 leading-relaxed"></p>
+                </div>
+                
+                <!-- Event Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Date & Time -->
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                            <span>📅</span> Date & Time
+                        </h4>
+                        <p id="overlayDate" class="text-sm text-blue-700 font-medium"></p>
+                        <p id="overlayTime" class="text-sm text-blue-600"></p>
+                    </div>
+                    
+                    <!-- Location -->
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-purple-800 mb-2 flex items-center gap-2">
+                            <span>📍</span> Location
+                        </h4>
+                        <p id="overlayVenue" class="text-sm text-purple-700 font-medium"></p>
+                        <p id="overlayBuilding" class="text-sm text-purple-600"></p>
+                    </div>
+                    
+                    <!-- Capacity -->
+                    <div id="overlayCapacitySection" class="bg-green-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                            <span>👥</span> Capacity
+                        </h4>
+                        <p id="overlayCapacity" class="text-sm text-green-700 font-medium"></p>
+                    </div>
+                    
+                    <!-- Registration -->
+                    <div class="bg-amber-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                            <span>📝</span> Registration
+                        </h4>
+                        <p id="overlayRegistration" class="text-sm text-amber-700 font-medium"></p>
+                    </div>
+                </div>
+                
+                <!-- Tags -->
+                <div id="overlayTagsSection" class="mb-6">
+                    <div id="overlayTags" class="flex flex-wrap gap-2"></div>
+                </div>
+                
+                <!-- Contact & Website -->
+                <div id="overlayLinksSection" class="mb-6 space-y-2">
+                    <div id="overlayContactSection" class="hidden">
+                        <a id="overlayContact" href="#" class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            📧 Contact Organizer
+                        </a>
+                    </div>
+                    <div id="overlayWebsiteSection" class="hidden">
+                        <a id="overlayWebsite" href="#" target="_blank" class="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 text-sm font-medium">
+                            🔗 Event Website
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                    <button id="bookEventBtn" class="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl">
+                        🎫 Book Now
+                    </button>
+                    <button id="shareEventBtn" class="bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors">
+                        📤 Share Event
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </body>

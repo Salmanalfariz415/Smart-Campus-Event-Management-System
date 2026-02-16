@@ -17,9 +17,11 @@ def create_app():
 
     from app.routes.auth_routes import auth_bp
     from app.routes.event_routes import event_bp
+    from app.routes.booking_routes import booking_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(event_bp)
+    app.register_blueprint(booking_bp)
 
     print("URL MAP:", app.url_map)
 

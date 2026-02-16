@@ -60,6 +60,52 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Add event listeners for overlay buttons
   document.getElementById("bookEventBtn").addEventListener("click", handleBooking);
   document.getElementById("shareEventBtn").addEventListener("click", handleSharing);
+  
+  // Add event listeners for booking modal
+  document.getElementById("closeBookingModal").addEventListener("click", () => {
+    document.getElementById("bookingModal").classList.add("hidden");
+  });
+  
+  document.getElementById("cancelBooking").addEventListener("click", () => {
+    document.getElementById("bookingModal").classList.add("hidden");
+  });
+  
+  document.getElementById("closeSuccessModal").addEventListener("click", () => {
+    document.getElementById("bookingSuccessModal").classList.add("hidden");
+  });
+  
+  // Update total amount when attendees count changes
+  document.getElementById("attendeesCount").addEventListener("change", updateTotalAmount);
+  
+  // Handle booking form submission
+  document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      event_id: parseInt(document.getElementById("bookingEventId").value),
+      contact_name: document.getElementById("contactName").value,
+      contact_email: document.getElementById("contactEmail").value,
+      contact_phone: document.getElementById("contactPhone").value,
+      attendees_count: parseInt(document.getElementById("attendeesCount").value),
+      special_requirements: document.getElementById("specialRequirements").value,
+      payment_amount: window.currentEventData?.fee > 0 ? window.currentEventData.fee * parseInt(document.getElementById("attendeesCount").value) : 0
+    };
+    
+    await submitBooking(formData);
+  });
+  
+  // Close modals when clicking outside
+  document.getElementById("bookingModal").addEventListener("click", (e) => {
+    if (e.target.id === "bookingModal") {
+      document.getElementById("bookingModal").classList.add("hidden");
+    }
+  });
+  
+  document.getElementById("bookingSuccessModal").addEventListener("click", (e) => {
+    if (e.target.id === "bookingSuccessModal") {
+      document.getElementById("bookingSuccessModal").classList.add("hidden");
+    }
+  });
 });
 
 // Function to populate overlay with event data
@@ -150,21 +196,82 @@ function populateOverlay(eventData) {
   window.currentEventData = eventData;
 }
 
-// Booking functionality
+// Booking functionality - Updated to use booking modal
 function handleBooking() {
   const eventData = window.currentEventData;
   if (!eventData) return;
   
-  if (eventData.website) {
-    // If there's a website, open it for registration
-    window.open(eventData.website, '_blank');
-  } else if (eventData.contact) {
-    // If there's contact info, open email client
-    window.location.href = `mailto:${eventData.contact}?subject=Registration for ${eventData.title}&body=Hi, I would like to register for the event "${eventData.title}" scheduled on ${eventData.start_date}.`;
+  // Show booking modal instead of simple actions
+  showBookingModal(eventData);
+}
+
+// Show booking modal
+function showBookingModal(eventData) {
+  const modal = document.getElementById('bookingModal');
+  const eventTitle = document.getElementById('bookingEventTitle');
+  const eventId = document.getElementById('bookingEventId');
+  const eventFee = document.getElementById('eventFee');
+  const totalAmount = document.getElementById('totalAmount');
+  
+  // Populate modal with event data
+  eventTitle.textContent = eventData.title;
+  eventId.value = eventData.id;
+  
+  // Set fee information
+  const feeText = eventData.fee > 0 ? `₹${eventData.fee}` : 'FREE';
+  eventFee.textContent = feeText;
+  updateTotalAmount(); // Calculate initial total
+  
+  modal.classList.remove('hidden');
+}
+
+// Update total amount based on attendees
+function updateTotalAmount() {
+  const eventData = window.currentEventData;
+  const attendeesCount = parseInt(document.getElementById('attendeesCount').value) || 1;
+  const totalElement = document.getElementById('totalAmount');
+  
+  if (eventData && eventData.fee > 0) {
+    const total = eventData.fee * attendeesCount;
+    totalElement.textContent = `₹${total}`;
   } else {
-    // Generic booking confirmation
-    alert(`Booking initiated for "${eventData.title}"!\n\nPlease contact the organizer for further registration details.`);
+    totalElement.textContent = 'FREE';
   }
+}
+
+// Handle booking form submission
+async function submitBooking(formData) {
+  try {
+    const response = await fetch('http://127.0.0.1:5000/booking/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      // Hide booking modal and show success modal
+      document.getElementById('bookingModal').classList.add('hidden');
+      showBookingSuccess(result.booking_reference);
+    } else {
+      alert(`Booking failed: ${result.error}`);
+    }
+  } catch (error) {
+    console.error('Booking error:', error);
+    alert('Booking failed. Please try again.');
+  }
+}
+
+// Show booking success modal
+function showBookingSuccess(bookingReference) {
+  const modal = document.getElementById('bookingSuccessModal');
+  const refElement = document.getElementById('bookingReference');
+  
+  refElement.textContent = bookingReference;
+  modal.classList.remove('hidden');
 }
 
 // Sharing functionality

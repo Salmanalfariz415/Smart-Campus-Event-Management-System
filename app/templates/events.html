@@ -12,85 +12,67 @@
 
 <body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 overflow-x-hidden">
     <!-- Navigation Bar -->
-    <div class="nav grid grid-cols-7 fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-slate-900 to-indigo-950 text-white shadow-lg z-50">
+    <nav class="nav grid grid-cols-7 fixed top-0 left-0 w-full h-16 bg-gradient-to-r from-slate-900 to-indigo-950 text-white shadow-lg z-50" role="navigation" aria-label="Main navigation">
         <div id="logo" class="col-span-1 flex justify-center items-center">
-            <img src="../static/images/logo.png" class="h-9 w-30">
+            <img src="../static/images/logo.png" alt="Event Management System Logo" class="h-9 w-30">
         </div>
         <div class="col-span-1"></div>
         <div class="col-span-1"></div>
-        <div></div>
-        <a class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold" href="./home.html">Home</a>
-        <h1 class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold cursor-pointer">Categories</h1>
-        <a href="./addEvent.html" class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold">Organizer Access</a>
-    </div>
+        <div class="col-span-1"></div>
+        <a class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold" href="./home.html" aria-label="Go to Home page">Home</a>
+        <button class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold cursor-pointer text-left" aria-label="View event categories">Categories</button>
+        <a href="./addEvent.html" class="col-span-1 pt-5 hover:text-cyan-400 transition-colors duration-300 font-semibold" aria-label="Access organizer features">Organizer Access</a>
+    </nav>
 
-    <!-- Search Bar -->
-    <div class="grid grid-cols-3 items-center search relative mt-16 h-28 w-full bg-gradient-to-r from-slate-50 to-indigo-50 pt-3 shadow-md">
-        <button class="mx-10 btn col-span-1 h-10 mt-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg">Filter</button>
-        <div class="col-span-2 flex justify-start item-center">
-            <div class="form-control mx-5">
-                <input id="searchInput" class="text-black input input-alt h-16 rounded-xl px-2 border-2 border-indigo-400 w-[35rem] focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all duration-300" placeholder="Search For Events" type="text">
-                <span class="input-border input-border-alt"></span>
-            </div>
-            <button id="searchButton" class="submit bg-gradient-to-r from-cyan-500 to-teal-500 h-10 w-24 rounded-xl text-xl text-white font-bold mt-3 hover:from-cyan-600 hover:to-teal-600 shadow-md hover:shadow-lg transition-all duration-300">Search</button>
+    <!-- Hero Video Section -->
+    <section class="relative h-[500px] overflow-hidden mt-16" aria-label="Hero section with video background">
+        <video 
+            autoplay 
+            muted 
+            loop 
+            playsinline 
+            class="absolute w-full h-full object-cover"
+            aria-label="Background video showcasing events"
+        >
+            <source src="../static/images/video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <div class="relative z-10 flex items-center justify-center h-full bg-black/50">
+            <h1 class="text-white text-4xl font-bold text-center">
+                Discover Amazing Events
+            </h1>
         </div>
-    </div>
-
-        <section class="relative h-[500px] overflow-hidden">
-    <video 
-        autoplay 
-        muted 
-        loop 
-        playsinline 
-        class="absolute w-full h-full object-cover"
-    >
-        <source src="../static/images/video.mp4" type="video/mp4">
-    </video>
-
-    <div class="relative z-10 flex items-center justify-center h-full bg-black/50">
-        <h1 class="text-white text-4xl font-bold">
-        Discover Amazing Events
-        </h1>
-    </div>
     </section>  
 
+    <!-- Search Bar -->
+    <section class="grid grid-cols-3 items-center search relative h-28 w-full bg-gradient-to-r from-slate-50 to-indigo-50 pt-3 shadow-md" aria-label="Event search and filter section">
+        <button class="mx-10 btn col-span-1 h-10 mt-5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 shadow-md transition-all duration-300 hover:shadow-lg" aria-label="Open filter options">Filter</button>
+        <div class="col-span-2 flex justify-start items-center">
+            <div class="form-control mx-5">
+                <label for="searchInput" class="sr-only">Search for events</label>
+                <input id="searchInput" class="text-black input input-alt h-16 rounded-xl px-2 border-2 border-indigo-400 w-[35rem] focus:border-purple-500 focus:ring-2 focus:ring-purple-300 transition-all duration-300" placeholder="Search For Events" type="text" aria-label="Search events by name, location, or category">
+                <span class="input-border input-border-alt"></span>
+            </div>
+            <button id="searchButton" class="submit bg-gradient-to-r from-cyan-500 to-teal-500 h-10 w-24 rounded-xl text-xl text-white font-bold mt-3 hover:from-cyan-600 hover:to-teal-600 shadow-md hover:shadow-lg transition-all duration-300" aria-label="Perform search">Search</button>
+        </div>
+    </section>
     <!-- Upcoming Events Section -->
-    <section class="p-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 min-h-screen">
+    <main class="p-8 bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50 min-h-screen">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Upcoming Events</h2>
             </div>
 
-            <div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div id="eventsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="main" aria-label="Events listing">
             </div>
         </div>
-    </section>
-
-    <!-- Slider Script -->
-    <script>
-        let currentIndex = 0;
-        const slider = document.getElementById('slider');
-        const totalSlides = slider.children.length;
-
-        function updateSlider() {
-            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
-        }
-
-        function next() {
-            currentIndex = (currentIndex + 1) % totalSlides;
-            updateSlider();
-        }
-
-        function prev() {
-            currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-            updateSlider();
-        }
-    </script>
+    </main>
 
     <!-- Enhanced Event Overlay -->
-    <div id="eventOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] flex items-center justify-center p-4">
+    <div id="eventOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] flex items-center justify-center p-4" role="dialog" aria-labelledby="overlayTitle" aria-modal="true">
         <div class="bg-gradient-to-br from-white to-indigo-50 rounded-2xl relative shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <button id="closeOverlay" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl font-bold transition-colors duration-300 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg">✕</button>
+            <button id="closeOverlay" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl font-bold transition-colors duration-300 z-10 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg" aria-label="Close event details">✕</button>
             
             <!-- Event Header -->
             <div id="overlayHeader" class="h-32 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 rounded-t-2xl relative overflow-hidden">
@@ -194,47 +176,52 @@
     </div>
 
     <!-- Booking Modal -->
-    <div id="bookingModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+    <div id="bookingModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" role="dialog" aria-labelledby="bookingModalTitle" aria-modal="true">
         <div class="bg-white rounded-2xl relative shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <button id="closeBookingModal" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-xl font-bold transition-colors duration-300 z-10 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center">✖</button>
+            <button id="closeBookingModal" class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-xl font-bold transition-colors duration-300 z-10 bg-gray-100 rounded-full w-8 h-8 flex items-center justify-center" aria-label="Close booking form">✖</button>
             
             <!-- Booking Header -->
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
-                <h2 class="text-xl font-bold mb-2">Book Your Spot</h2>
+                <h2 id="bookingModalTitle" class="text-xl font-bold mb-2">Book Your Spot</h2>
                 <p id="bookingEventTitle" class="text-blue-100 text-sm"></p>
             </div>
             
             <!-- Booking Form -->
             <div class="p-6">
-                <form id="bookingForm" class="space-y-4">
+                <form id="bookingForm" class="space-y-4" novalidate>
                     <input type="hidden" id="bookingEventId" name="event_id">
                     
                     <!-- Contact Name -->
                     <div>
                         <label for="contactName" class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                         <input type="text" id="contactName" name="contact_name" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            aria-describedby="contactNameError">
                     </div>
                     
                     <!-- Contact Email -->
                     <div>
                         <label for="contactEmail" class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                         <input type="email" id="contactEmail" name="contact_email" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            aria-describedby="contactEmailError">
                     </div>
                     
                     <!-- Contact Phone -->
                     <div>
                         <label for="contactPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input type="tel" id="contactPhone" name="contact_phone"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            aria-describedby="contactPhoneHelper">
+                        <small id="contactPhoneHelper" class="text-xs text-gray-500">Optional: Include country code if international</small>
                     </div>
                     
                     <!-- Attendees Count -->
                     <div>
                         <label for="attendeesCount" class="block text-sm font-medium text-gray-700 mb-1">Number of Attendees *</label>
                         <select id="attendeesCount" name="attendees_count" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            aria-describedby="attendeesCountHelper">
                             <option value="1">1 Person</option>
                             <option value="2">2 People</option>
                             <option value="3">3 People</option>
@@ -246,6 +233,7 @@
                             <option value="9">9 People</option>
                             <option value="10">10 People</option>
                         </select>
+                        <small id="attendeesCountHelper" class="text-xs text-gray-500">Select total number of people attending</small>
                     </div>
                     
                     <!-- Special Requirements -->
@@ -253,18 +241,21 @@
                         <label for="specialRequirements" class="block text-sm font-medium text-gray-700 mb-1">Special Requirements (Optional)</label>
                         <textarea id="specialRequirements" name="special_requirements" rows="2"
                             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                            placeholder="Any dietary restrictions, accessibility needs, etc."></textarea>
+                            placeholder="Any dietary restrictions, accessibility needs, etc."
+                            aria-describedby="specialRequirementsHelper"></textarea>
+                        <small id="specialRequirementsHelper" class="text-xs text-gray-500">Let us know about any special accommodations needed</small>
                     </div>
                     
                     <!-- Event Fee Display -->
-                    <div id="feeDisplay" class="bg-gray-50 p-3 rounded-lg">
+                    <div id="feeDisplay" class="bg-gray-50 p-3 rounded-lg" role="region" aria-labelledby="feeDisplayTitle">
+                        <h3 id="feeDisplayTitle" class="sr-only">Event pricing information</h3>
                         <div class="flex justify-between items-center">
                             <span class="text-sm text-gray-600">Event Fee:</span>
                             <span id="eventFee" class="font-semibold text-gray-800">FREE</span>
                         </div>
                         <div class="flex justify-between items-center mt-1">
                             <span class="text-sm text-gray-600">Total Amount:</span>
-                            <span id="totalAmount" class="font-bold text-lg text-blue-600">FREE</span>
+                            <span id="totalAmount" class="font-bold text-lg text-blue-600" aria-live="polite">FREE</span>
                         </div>
                     </div>
                     
@@ -285,20 +276,20 @@
     </div>
 
     <!-- Booking Success Modal -->
-    <div id="bookingSuccessModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+    <div id="bookingSuccessModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" role="dialog" aria-labelledby="successModalTitle" aria-modal="true">
         <div class="bg-white rounded-2xl relative shadow-2xl max-w-md w-full">
             <div class="text-center p-6">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                     <span class="text-2xl">✅</span>
                 </div>
-                <h2 class="text-xl font-bold text-gray-800 mb-2">Booking Confirmed!</h2>
+                <h2 id="successModalTitle" class="text-xl font-bold text-gray-800 mb-2">Booking Confirmed!</h2>
                 <p class="text-gray-600 mb-4">Your booking has been successfully confirmed.</p>
                 <div class="bg-gray-50 p-4 rounded-lg mb-4">
                     <p class="text-sm text-gray-600">Booking Reference:</p>
-                    <p id="bookingReference" class="font-mono text-lg font-bold text-blue-600"></p>
+                    <p id="bookingReference" class="font-mono text-lg font-bold text-blue-600" aria-label="Booking reference number"></p>
                 </div>
                 <button id="closeSuccessModal" 
-                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+                    class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all" aria-label="Close success message">
                     Great!
                 </button>
             </div>

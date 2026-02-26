@@ -1,27 +1,18 @@
 
 let eventsData = []; // Global variable to store events
+let filteredEvents = []; // Global variable to store filtered events
 
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('DOM loaded, starting fetch...');
 
   try {
     eventsData = await add_card();
+    filteredEvents = [...eventsData]; // Initialize filtered events with all events
     console.log('Events received:', eventsData); // Check what you got
     console.log('Number of events:', eventsData?.length);
 
-    const container = document.getElementById('eventsContainer');
-    console.log('Container found:', container); // Make sure container exists
-
-    if (!eventsData || eventsData.length === 0) {
-      console.warn('No events to display');
-      container.innerHTML = '<p class="col-span-full text-center">No events available</p>';
-      return;
-    }
-
-    eventsData.forEach((eventData, index) => {
-      console.log(`Adding card ${index + 1}:`, eventData);
-      container.insertAdjacentHTML('beforeend', createEventCard(eventData, index));
-    });
+    displayEvents(filteredEvents);
+    setupSearchFunctionality(); // Setup search functionality
 
     console.log('All cards added successfully');
   } catch (e) {
@@ -29,33 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('eventsContainer').innerHTML =
       '<p class="col-span-full text-center text-red-500">Error loading events</p>';
   }
-
-  const buttons = document.querySelectorAll(".event_button");
-  const overlay = document.getElementById("eventOverlay");
-  const closeBtn = document.getElementById("closeOverlay");
-  const overlayTitle = document.getElementById("overlayTitle");
-  const overlayDesc = document.getElementById("overlayDesc");
-
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const eventIndex = parseInt(btn.dataset.index);
-      const eventData = eventsData[eventIndex];
-      if (!eventData) return;
-
-      populateOverlay(eventData);
-      overlay.classList.remove("hidden");
-    });
-  });
-
-  closeBtn.addEventListener("click", () => {
-    overlay.classList.add("hidden");
-  });
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
-      overlay.classList.add("hidden");
-    }
-  });
 
   // Add event listeners for overlay buttons
   document.getElementById("bookEventBtn").addEventListener("click", handleBooking);
@@ -107,6 +71,155 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+// Function to display events
+function displayEvents(events) {
+  const container = document.getElementById('eventsContainer');
+  console.log('Container found:', container); // Make sure container exists
+
+  if (!events || events.length === 0) {
+    container.innerHTML = '<div class="col-span-full text-center py-12"><div class="text-gray-500 text-lg mb-2">🔍</div><p class="text-gray-600">No events found matching your search</p><p class="text-gray-500 text-sm mt-2">Try different keywords or clear your search</p></div>';
+    return;
+  }
+
+  // Clear existing content
+  container.innerHTML = '';
+
+  events.forEach((eventData, index) => {
+    console.log(`Adding card ${index + 1}:`, eventData);
+    container.insertAdjacentHTML('beforeend', createEventCard(eventData, getOriginalIndex(eventData)));
+  });
+
+  // Re-attach event listeners for the new cards
+  attachEventListeners();
+}
+
+// Function to get original index of event in eventsData array
+function getOriginalIndex(eventData) {
+  return eventsData.findIndex(event => event.id === eventData.id);
+}
+
+// Function to setup search functionality
+function setupSearchFunctionality() {
+  const searchInput = document.getElementById('searchInput');
+  const searchButton = document.getElementById('searchButton');
+  const filterButton = document.querySelector('.btn');
+
+  if (!searchInput || !searchButton) {
+    console.warn('Search elements not found');
+    return;
+  }
+
+  // Real-time search as user types
+  searchInput.addEventListener('input', (e) => {
+    performSearch(e.target.value);
+  });
+
+  // Search on button click
+  searchButton.addEventListener('click', () => {
+    performSearch(searchInput.value);
+  });
+
+  // Search on Enter key
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch(searchInput.value);
+    }
+  });
+
+  // Clear search functionality
+  searchInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Escape' || (e.key === 'Backspace' && searchInput.value === '')) {
+      performSearch('');
+    }
+  });
+
+  // Filter button functionality (placeholder for future enhancement)
+  if (filterButton) {
+    filterButton.addEventListener('click', () => {
+      // Placeholder for filter modal/dropdown
+      console.log('Filter functionality - to be implemented');
+    });
+  }
+}
+
+// Function to perform search
+function performSearch(searchQuery) {
+  const query = searchQuery.toLowerCase().trim();
+  
+  if (!query) {
+    // If search is empty, show all events
+    filteredEvents = [...eventsData];
+  } else {
+    // Filter events based on search query
+    filteredEvents = eventsData.filter(event => {
+      return (
+        // Search in title
+        (event.title && event.title.toLowerCase().includes(query)) ||
+        // Search in description
+        (event.description && event.description.toLowerCase().includes(query)) ||
+        // Search in organization
+        (event.organization && event.organization.toLowerCase().includes(query)) ||
+        // Search in venue
+        (event.venue && event.venue.toLowerCase().includes(query)) ||
+        // Search in building
+        (event.building && event.building.toLowerCase().includes(query)) ||
+        // Search in event category
+        (event.event_category && event.event_category.toLowerCase().replace(/_/g, ' ').includes(query)) ||
+        // Search in tag
+        (event.tag && event.tag.toLowerCase().includes(query)) ||
+        // Search in event type
+        (event.event_type && event.event_type.toLowerCase().includes(query))
+      );
+    });
+  }
+
+  // Update the display
+  displayEvents(filteredEvents);
+  
+  // Update search input styling based on results
+  const searchInput = document.getElementById('searchInput');
+  if (query && filteredEvents.length === 0) {
+    searchInput.classList.add('border-red-400', 'focus:border-red-500');
+    searchInput.classList.remove('border-indigo-400', 'focus:border-purple-500');
+  } else {
+    searchInput.classList.remove('border-red-400', 'focus:border-red-500');
+    searchInput.classList.add('border-indigo-400', 'focus:border-purple-500');
+  }
+}
+
+// Function to attach event listeners to event cards
+function attachEventListeners() {
+  const buttons = document.querySelectorAll(".event_button");
+  const overlay = document.getElementById("eventOverlay");
+  const closeBtn = document.getElementById("closeOverlay");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const eventIndex = parseInt(btn.dataset.index);
+      const eventData = eventsData[eventIndex];
+      if (!eventData) return;
+
+      populateOverlay(eventData);
+      overlay.classList.remove("hidden");
+    });
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      overlay.classList.add("hidden");
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) {
+        overlay.classList.add("hidden");
+      }
+    });
+  }
+}
 
 // Function to populate overlay with event data
 function populateOverlay(eventData) {

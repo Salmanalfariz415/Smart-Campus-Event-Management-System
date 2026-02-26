@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify, Blueprint, render_template
 from app.db.sql_connection import get_sql_connection
 import app.dao.event_dao as event_dao
 import traceback
@@ -10,6 +10,11 @@ import os, uuid
 
 
 event_bp = Blueprint('event', __name__, url_prefix='/event')
+
+@event_bp.route('/events', methods=['GET'])
+def events_page():
+    """Serve the events HTML page"""
+    return render_template('events.html')
 
 @event_bp.route('/submit', methods=['POST', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])

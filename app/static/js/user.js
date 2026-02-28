@@ -2,10 +2,16 @@ const submit=document.getElementById("submit");
 const submit_l=document.getElementById("submit_l")
 
 if(submit_l){
-    submit_l.addEventListener(("click"),()=>{
+    submit_l.addEventListener(("click"),async ()=>{
         const username=document.getElementById("username_l").value;
         const password=document.getElementById("password_l").value;
-        return login(username,password)
+        const data = await login(username,password);
+        if(data && data.result){
+            localStorage.setItem('token', data.result);
+            window.location.href = './profile.html';
+        } else if(data){
+            alert(data.message || 'Login failed');
+        }
     })
 }
 

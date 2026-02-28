@@ -201,6 +201,55 @@ def cancel_booking(connection, booking_reference):
         if cursor:
             cursor.close()
 
+def get_user_bookings(connection, user_id):
+    """Get all bookings for a specific user"""
+    cursor = None
+    try:
+        cursor = connection.cursor()
+
+        query = """
+        SELECT b.id, b.booking_reference, b.attendees_count,
+               b.status, b.contact_name, b.contact_email,
+               b.payment_amount, b.payment_status, b.booking_date, b.created_at,
+               e.title as event_title, e.start_date, e.start_time, e.venue, e.id as event_id
+        FROM bookings b
+        JOIN events e ON b.event_id = e.id
+        WHERE b.user_id = %s
+        ORDER BY b.created_at DESC
+        """
+
+        cursor.execute(query, (user_id,))
+        results = cursor.fetchall()
+
+        bookings = []
+        for result in results:
+            bookings.append({
+                'id': result[0],
+                'booking_reference': result[1],
+                'attendees_count': result[2],
+                'status': result[3],
+                'contact_name': result[4],
+                'contact_email': result[5],
+                'payment_amount': float(result[6]) if result[6] else 0.00,
+                'payment_status': result[7],
+                'booking_date': result[8].strftime('%Y-%m-%d %H:%M:%S') if result[8] else '',
+                'created_at': result[9].strftime('%Y-%m-%d %H:%M:%S') if result[9] else '',
+                'event_title': result[10],
+                'event_start_date': result[11].strftime('%Y-%m-%d') if result[11] else '',
+                'event_start_time': str(result[12]) if result[12] else '',
+                'event_venue': result[13],
+                'event_id': result[14],
+            })
+
+        return bookings
+
+    except mysql.connector.Error as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if cursor:
+            cursor.close()
+
+
 def get_event_bookings(connection, event_id):
     """Get all bookings for a specific event"""
     cursor = None

@@ -3,8 +3,25 @@ from app.db.sql_connection import get_sql_connection
 import app.dao.booking_dao as booking_dao
 import traceback
 from flask_cors import cross_origin
+import jwt
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 booking_bp = Blueprint('booking', __name__, url_prefix='/booking')
+
+def _get_user_id_from_token():
+    """Extract user_id from Bearer JWT. Returns None if token is absent or invalid."""
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return None
+    try:
+        token = auth_header.split(' ', 1)[1]
+        payload = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=['HS256'])
+        return payload.get('user_id')
+    except jwt.PyJWTError:
+        return None
 
 @booking_bp.route('/create', methods=['POST', 'OPTIONS'])
 @cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
@@ -16,6 +33,11 @@ def create_booking():
     try:
         connection = get_sql_connection()
         data = request.get_json()
+        
+        # Attach user_id from JWT if the request is authenticated
+        user_id = _get_user_id_from_token()
+        if user_id:
+            data['user_id'] = user_id
         
         # Validate required fields
         required_fields = ['event_id', 'contact_name', 'contact_email']

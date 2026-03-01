@@ -37,11 +37,12 @@ def register():
         password = data.get('password')
 
         connection = get_sql_connection()
-        user_id = auth_dao.register_user(connection,username,password)
+        result = auth_dao.register_user(connection, username, password)
 
         return jsonify({
             "message": "Registration successful",
-            "user_id": user_id
+            "user_id": result["user_id"],
+            "token": result["token"]
         }), 201
 
     except Exception as e:
@@ -55,6 +56,7 @@ def register():
             connection.close()
 
 @auth_bp.route('/login',methods=['POST'])
+@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
 def login():
     connection = None
     try:
@@ -70,6 +72,11 @@ def login():
             "message": "Login successful",
             "result": result
         }), 200
+
+    except Exception as e:
+        print("=== LOGIN ERROR ===")
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
     finally:
         if connection:

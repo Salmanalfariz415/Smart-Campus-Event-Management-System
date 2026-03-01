@@ -59,11 +59,17 @@ async function register(name,password){
     }
 }
 if(submit){
-    submit.addEventListener("click",()=>{
-    const email=document.getElementById("email").value;
-    const passwd=document.getElementById("password").value;
-    return register(email,passwd);
-})
+    submit.addEventListener("click", async ()=>{
+        const email=document.getElementById("email").value;
+        const passwd=document.getElementById("password").value;
+        const data = await register(email, passwd);
+        if(data && data.token){
+            localStorage.setItem('token', data.token);
+            window.location.href = './profile.html';
+        } else if(data){
+            alert(data.error || 'Registration failed');
+        }
+    });
 }
 
 const submit_organizer=document.getElementById("submit_organizer");

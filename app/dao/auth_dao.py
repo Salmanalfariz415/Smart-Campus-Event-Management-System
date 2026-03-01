@@ -3,6 +3,19 @@ import jwt
 from dotenv import load_dotenv
 import os
 import bcrypt
+import datetime
+
+load_dotenv()
+
+def _make_token(user_id, user_type):
+    """Return a signed JWT valid for 24 hours."""
+    payload = {
+        "user_id": user_id,
+        "user_type": user_type,
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    }
+    return jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
+
 def register_user(connection, username, password, user_type='user'):
     cursor = None
     try:
@@ -14,8 +27,10 @@ def register_user(connection, username, password, user_type='user'):
         )
         cursor.execute(query, (username, hashed_password, user_type))
         connection.commit()
-        return cursor.lastrowid
-    except mysql.connector.Error as e:  # Now you can catch this
+        user_id = cursor.lastrowid
+        token = _make_token(user_id, user_type)
+        return {"user_id": user_id, "token": token}
+    except mysql.connector.Error as e:
         connection.rollback()
         raise Exception(f"Database error: {e}")
     finally:
@@ -29,18 +44,14 @@ def login_user(connection,username,password):
         values=(username,)
         cursor.execute(query,values)
         result=cursor.fetchone()
-        user_ID,stored_password,user_type=result
-        if bcrypt.checkpw(
-                password.encode("utf-8"),
-                stored_password.encode("utf-8")
-        ):
-            load_dotenv()
-            token = jwt.encode(
-                {"user_id": user_ID, "user_type": user_type},
-                os.getenv("SECRET_KEY"),
-                algorithm="HS256"
-            )
-            return token
+        if result is None:
+            return "Incorrect username or password"
+        user_ID, stored_password, user_type = result
+        # stored_password may be str or bytes depending on the column type
+        if isinstance(stored_password, str):
+            stored_password = stored_password.encode("utf-8")
+        if bcrypt.checkpw(password.encode("utf-8"), stored_password):
+            return _make_token(user_ID, user_type)
         else:
             return "Incorrect username or password"
         cursor.close()

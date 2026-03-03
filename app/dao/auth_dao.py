@@ -1,11 +1,13 @@
-import mysql.connector
 import jwt
 from dotenv import load_dotenv
 import os
 import bcrypt
 import datetime
+import psycopg2
 
 load_dotenv()
+
+connection= psycopg2.connect(os.getenv("DATABASE_URL"))
 
 def _make_token(user_id, user_type):
     """Return a signed JWT valid for 24 hours."""
@@ -20,17 +22,17 @@ def register_user(connection, username, password, user_type='user'):
     cursor = None
     try:
         cursor = connection.cursor()
-        query = "INSERT INTO users (email, password_hash, user_type) VALUES (%s, %s, %s)"
+        query = "INSERT INTO users (email, password_hash, user_type) VALUES (%s, %s, %s) RETURNING id"
         hashed_password = bcrypt.hashpw(
             password.encode("utf-8"),
             bcrypt.gensalt()
-        )
+        ).decode("utf-8")
         cursor.execute(query, (username, hashed_password, user_type))
+        user_id = cursor.fetchone()[0]
         connection.commit()
-        user_id = cursor.lastrowid
         token = _make_token(user_id, user_type)
         return {"user_id": user_id, "token": token}
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         connection.rollback()
         raise Exception(f"Database error: {e}")
     finally:
@@ -101,7 +103,7 @@ def get_user_details(connection, user_id):
         
         return user_data
         
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         raise Exception(f"Database error: {e}")
     finally:
         if cursor:
@@ -113,19 +115,19 @@ def register_organizer(connection, org_data):
         cursor = connection.cursor()
         
 
-        user_id = register_user(
+        result = register_user(
             connection, 
             org_data['email'], 
             org_data['password'], 
             'organizer'
         )
-        
+        user_id = result['user_id']
         
         organizer_query = """
         INSERT INTO organizers 
         (user_id, org_name, org_type, org_description, contact_name, 
          contact_position, phone) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id
         """
         
         organizer_values = (
@@ -139,14 +141,15 @@ def register_organizer(connection, org_data):
         )
         
         cursor.execute(organizer_query, organizer_values)
+        organizer_id = cursor.fetchone()[0]
         connection.commit()
         
         return {
             'user_id': user_id,
-            'organizer_id': cursor.lastrowid
+            'organizer_id': organizer_id
         }
         
-    except mysql.connector.Error as e:
+    except psycopg2.Error as e:
         connection.rollback()
         raise Exception(f"Database error: {e}")
     finally:

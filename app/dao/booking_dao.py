@@ -1,288 +1,255 @@
-import mysql.connector
+"""
+Booking DAO — pure Supabase client (no psycopg2 / cursor)
+"""
 import random
 import string
-from datetime import datetime
+from ..supabase_client import supabase
+
 
 def generate_booking_reference():
     """Generate a unique booking reference like BK001234"""
-    random_num = ''.join(random.choices(string.digits, k=6))
+    random_num = "".join(random.choices(string.digits, k=6))
     return f"BK{random_num}"
 
-def create_booking(connection, booking_data):
+
+def create_booking(booking_data):
     """Create a new booking for an event"""
-    cursor = None
-    try:
-        cursor = connection.cursor()
-        
-        # Generate unique booking reference
-        booking_ref = generate_booking_reference()
-        
-        # Check if booking reference already exists (very unlikely but safe)
-        while True:
-            check_query = "SELECT id FROM bookings WHERE booking_reference = %s"
-            cursor.execute(check_query, (booking_ref,))
-            if not cursor.fetchone():
-                break
-            booking_ref = generate_booking_reference()
-        
-        # Check available capacity
-        capacity_query = """
-        SELECT max_capacity, current_bookings, available_spots 
-        FROM event_capacity WHERE event_id = %s
-        """
-        cursor.execute(capacity_query, (booking_data['event_id'],))
-        capacity_result = cursor.fetchone()
-        
-        if capacity_result:
-            max_capacity, current_bookings, available_spots = capacity_result
-            attendees = booking_data.get('attendees_count', 1)
-            
-            if available_spots < attendees:
-                return {
-                    'success': False,
-                    'message': f'Not enough spots available. Only {available_spots} spots remaining.',
-                    'available_spots': available_spots
-                }
-        
-        # Create the booking
-        booking_query = """
-        INSERT INTO bookings 
-        (event_id, user_id, booking_reference, attendees_count, contact_name, 
-         contact_email, contact_phone, special_requirements, payment_amount, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        
-        booking_values = (
-            booking_data['event_id'],
-            booking_data.get('user_id'),  # None for guest bookings
-            booking_ref,
-            booking_data.get('attendees_count', 1),
-            booking_data['contact_name'],
-            booking_data['contact_email'],
-            booking_data.get('contact_phone', ''),
-            booking_data.get('special_requirements', ''),
-            booking_data.get('payment_amount', 0.00),
-            'confirmed'  # Auto-confirm for now
+
+    # Generate unique booking reference
+    booking_ref = generate_booking_reference()
+    while True:
+        check = (
+            supabase.table("bookings")
+            .select("id")
+            .eq("booking_reference", booking_ref)
+            .execute()
         )
-        
-        cursor.execute(booking_query, booking_values)
-        booking_id = cursor.lastrowid
-        
-        # Update event capacity
-        update_capacity_query = """
-        UPDATE event_capacity 
-        SET current_bookings = current_bookings + %s 
-        WHERE event_id = %s
-        """
-        cursor.execute(update_capacity_query, (booking_data.get('attendees_count', 1), booking_data['event_id']))
-        
-        # Log the booking creation
-        log_query = """
-        INSERT INTO booking_logs (booking_id, action, new_status, notes)
-        VALUES (%s, %s, %s, %s)
-        """
-        cursor.execute(log_query, (booking_id, 'created', 'confirmed', 'Booking created successfully'))
-        
-        connection.commit()
-        
-        return {
-            'success': True,
-            'booking_id': booking_id,
-            'booking_reference': booking_ref,
-            'message': 'Booking confirmed successfully!'
-        }
-        
-    except mysql.connector.Error as e:
-        connection.rollback()
-        raise Exception(f"Database error: {e}")
-    finally:
-        if cursor:
-            cursor.close()
+        if not check.data:
+            break
+        booking_ref = generate_booking_reference()
 
-def get_booking_by_reference(connection, booking_reference):
-    """Get booking details by reference number"""
-    cursor = None
-    try:
-        cursor = connection.cursor()
-        
-        query = """
-        SELECT b.id, b.event_id, b.booking_reference, b.attendees_count, 
-               b.status, b.contact_name, b.contact_email, b.contact_phone,
-               b.special_requirements, b.payment_amount, b.payment_status,
-               b.booking_date, b.created_at,
-               e.title as event_title, e.start_date, e.start_time, e.venue
-        FROM bookings b
-        JOIN events e ON b.event_id = e.id
-        WHERE b.booking_reference = %s
-        """
-        
-        cursor.execute(query, (booking_reference,))
-        result = cursor.fetchone()
-        
-        if not result:
-            return None
-            
-        booking_data = {
-            'id': result[0],
-            'event_id': result[1],
-            'booking_reference': result[2],
-            'attendees_count': result[3],
-            'status': result[4],
-            'contact_name': result[5],
-            'contact_email': result[6],
-            'contact_phone': result[7],
-            'special_requirements': result[8],
-            'payment_amount': float(result[9]) if result[9] else 0.00,
-            'payment_status': result[10],
-            'booking_date': result[11].strftime('%Y-%m-%d %H:%M:%S') if result[11] else '',
-            'created_at': result[12].strftime('%Y-%m-%d %H:%M:%S') if result[12] else '',
-            'event_details': {
-                'title': result[13],
-                'start_date': result[14].strftime('%Y-%m-%d') if result[14] else '',
-                'start_time': str(result[15]) if result[15] else '',
-                'venue': result[16]
+    # Check available capacity
+    cap = (
+        supabase.table("event_capacity")
+        .select("max_capacity, current_bookings, available_spots")
+        .eq("event_id", booking_data["event_id"])
+        .execute()
+    )
+    attendees = booking_data.get("attendees_count", 1)
+
+    if cap.data:
+        available = cap.data[0]["available_spots"]
+        if available < attendees:
+            return {
+                "success": False,
+                "message": f"Not enough spots available. Only {available} spots remaining.",
+                "available_spots": available,
             }
-        }
-        
-        return booking_data
-        
-    except mysql.connector.Error as e:
-        raise Exception(f"Database error: {e}")
-    finally:
-        if cursor:
-            cursor.close()
 
-def cancel_booking(connection, booking_reference):
+    # Insert booking
+    row = {
+        "event_id": booking_data["event_id"],
+        "user_id": booking_data.get("user_id"),
+        "booking_reference": booking_ref,
+        "attendees_count": attendees,
+        "contact_name": booking_data["contact_name"],
+        "contact_email": booking_data["contact_email"],
+        "contact_phone": booking_data.get("contact_phone", ""),
+        "special_requirements": booking_data.get("special_requirements", ""),
+        "payment_amount": booking_data.get("payment_amount", 0.00),
+        "status": "confirmed",
+    }
+    ins = supabase.table("bookings").insert(row).execute()
+    if not ins.data:
+        raise Exception("Failed to create booking")
+
+    booking_id = ins.data[0]["id"]
+
+    # Update event capacity
+    if cap.data:
+        new_current = cap.data[0]["current_bookings"] + attendees
+        supabase.table("event_capacity").update(
+            {"current_bookings": new_current}
+        ).eq("event_id", booking_data["event_id"]).execute()
+
+    # Log the booking creation
+    try:
+        supabase.table("booking_logs").insert(
+            {
+                "booking_id": booking_id,
+                "action": "created",
+                "new_status": "confirmed",
+                "notes": "Booking created successfully",
+            }
+        ).execute()
+    except Exception:
+        pass  # logging is best-effort
+
+    return {
+        "success": True,
+        "booking_id": booking_id,
+        "booking_reference": booking_ref,
+        "message": "Booking confirmed successfully!",
+    }
+
+
+def get_booking_by_reference(booking_reference):
+    """Get booking details by reference number"""
+    result = (
+        supabase.table("bookings")
+        .select(
+            "id, event_id, booking_reference, attendees_count, status, "
+            "contact_name, contact_email, contact_phone, special_requirements, "
+            "payment_amount, payment_status, booking_date, created_at, "
+            "events(title, start_date, start_time, venue)"
+        )
+        .eq("booking_reference", booking_reference)
+        .execute()
+    )
+
+    if not result.data:
+        return None
+
+    row = result.data[0]
+    evt = row.get("events") or {}
+
+    return {
+        "id": row["id"],
+        "event_id": row["event_id"],
+        "booking_reference": row["booking_reference"],
+        "attendees_count": row["attendees_count"],
+        "status": row["status"],
+        "contact_name": row["contact_name"],
+        "contact_email": row["contact_email"],
+        "contact_phone": row.get("contact_phone", ""),
+        "special_requirements": row.get("special_requirements", ""),
+        "payment_amount": float(row["payment_amount"]) if row.get("payment_amount") else 0.00,
+        "payment_status": row.get("payment_status"),
+        "booking_date": str(row.get("booking_date", "")),
+        "created_at": str(row.get("created_at", "")),
+        "event_details": {
+            "title": evt.get("title", ""),
+            "start_date": str(evt.get("start_date", "")),
+            "start_time": str(evt.get("start_time", "")),
+            "venue": evt.get("venue", ""),
+        },
+    }
+
+
+def cancel_booking(booking_reference):
     """Cancel a booking by reference number"""
-    cursor = None
-    try:
-        cursor = connection.cursor()
-        
-        # Get current booking details
-        get_query = "SELECT id, event_id, attendees_count, status FROM bookings WHERE booking_reference = %s"
-        cursor.execute(get_query, (booking_reference,))
-        result = cursor.fetchone()
-        
-        if not result:
-            return {'success': False, 'message': 'Booking not found'}
-            
-        booking_id, event_id, attendees_count, current_status = result
-        
-        if current_status == 'cancelled':
-            return {'success': False, 'message': 'Booking is already cancelled'}
-        
-        # Update booking status
-        update_query = "UPDATE bookings SET status = 'cancelled', updated_at = NOW() WHERE booking_reference = %s"
-        cursor.execute(update_query, (booking_reference,))
-        
-        # Update event capacity
-        capacity_query = """
-        UPDATE event_capacity 
-        SET current_bookings = current_bookings - %s 
-        WHERE event_id = %s
-        """
-        cursor.execute(capacity_query, (attendees_count, event_id))
-        
-        # Log the cancellation
-        log_query = """
-        INSERT INTO booking_logs (booking_id, action, old_status, new_status, notes)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(log_query, (booking_id, 'cancelled', current_status, 'cancelled', 'Booking cancelled by user'))
-        
-        connection.commit()
-        
-        return {'success': True, 'message': 'Booking cancelled successfully'}
-        
-    except mysql.connector.Error as e:
-        connection.rollback()
-        raise Exception(f"Database error: {e}")
-    finally:
-        if cursor:
-            cursor.close()
+    result = (
+        supabase.table("bookings")
+        .select("id, event_id, attendees_count, status")
+        .eq("booking_reference", booking_reference)
+        .execute()
+    )
 
-def get_user_bookings(connection, user_id):
+    if not result.data:
+        return {"success": False, "message": "Booking not found"}
+
+    row = result.data[0]
+    if row["status"] == "cancelled":
+        return {"success": False, "message": "Booking is already cancelled"}
+
+    # Update status
+    supabase.table("bookings").update({"status": "cancelled"}).eq(
+        "booking_reference", booking_reference
+    ).execute()
+
+    # Update event capacity
+    cap = (
+        supabase.table("event_capacity")
+        .select("current_bookings")
+        .eq("event_id", row["event_id"])
+        .execute()
+    )
+    if cap.data:
+        new_current = max(0, cap.data[0]["current_bookings"] - row["attendees_count"])
+        supabase.table("event_capacity").update(
+            {"current_bookings": new_current}
+        ).eq("event_id", row["event_id"]).execute()
+
+    # Log the cancellation
+    try:
+        supabase.table("booking_logs").insert(
+            {
+                "booking_id": row["id"],
+                "action": "cancelled",
+                "old_status": row["status"],
+                "new_status": "cancelled",
+                "notes": "Booking cancelled by user",
+            }
+        ).execute()
+    except Exception:
+        pass
+
+    return {"success": True, "message": "Booking cancelled successfully"}
+
+
+def get_user_bookings(user_id):
     """Get all bookings for a specific user"""
-    cursor = None
-    try:
-        cursor = connection.cursor()
+    result = (
+        supabase.table("bookings")
+        .select(
+            "id, booking_reference, attendees_count, status, contact_name, "
+            "contact_email, payment_amount, payment_status, booking_date, created_at, "
+            "events(id, title, start_date, start_time, venue)"
+        )
+        .eq("user_id", user_id)
+        .order("created_at", desc=True)
+        .execute()
+    )
 
-        query = """
-        SELECT b.id, b.booking_reference, b.attendees_count,
-               b.status, b.contact_name, b.contact_email,
-               b.payment_amount, b.payment_status, b.booking_date, b.created_at,
-               e.title as event_title, e.start_date, e.start_time, e.venue, e.id as event_id
-        FROM bookings b
-        JOIN events e ON b.event_id = e.id
-        WHERE b.user_id = %s
-        ORDER BY b.created_at DESC
-        """
-
-        cursor.execute(query, (user_id,))
-        results = cursor.fetchall()
-
-        bookings = []
-        for result in results:
-            bookings.append({
-                'id': result[0],
-                'booking_reference': result[1],
-                'attendees_count': result[2],
-                'status': result[3],
-                'contact_name': result[4],
-                'contact_email': result[5],
-                'payment_amount': float(result[6]) if result[6] else 0.00,
-                'payment_status': result[7],
-                'booking_date': result[8].strftime('%Y-%m-%d %H:%M:%S') if result[8] else '',
-                'created_at': result[9].strftime('%Y-%m-%d %H:%M:%S') if result[9] else '',
-                'event_title': result[10],
-                'event_start_date': result[11].strftime('%Y-%m-%d') if result[11] else '',
-                'event_start_time': str(result[12]) if result[12] else '',
-                'event_venue': result[13],
-                'event_id': result[14],
-            })
-
-        return bookings
-
-    except mysql.connector.Error as e:
-        raise Exception(f"Database error: {e}")
-    finally:
-        if cursor:
-            cursor.close()
+    bookings = []
+    for row in result.data:
+        evt = row.get("events") or {}
+        bookings.append(
+            {
+                "id": row["id"],
+                "booking_reference": row["booking_reference"],
+                "attendees_count": row["attendees_count"],
+                "status": row["status"],
+                "contact_name": row["contact_name"],
+                "contact_email": row["contact_email"],
+                "payment_amount": float(row["payment_amount"]) if row.get("payment_amount") else 0.00,
+                "payment_status": row.get("payment_status"),
+                "booking_date": str(row.get("booking_date", "")),
+                "created_at": str(row.get("created_at", "")),
+                "event_title": evt.get("title", ""),
+                "event_start_date": str(evt.get("start_date", "")),
+                "event_start_time": str(evt.get("start_time", "")),
+                "event_venue": evt.get("venue", ""),
+                "event_id": evt.get("id"),
+            }
+        )
+    return bookings
 
 
-def get_event_bookings(connection, event_id):
+def get_event_bookings(event_id):
     """Get all bookings for a specific event"""
-    cursor = None
-    try:
-        cursor = connection.cursor()
-        
-        query = """
-        SELECT booking_reference, contact_name, contact_email, attendees_count, 
-               status, booking_date, payment_status
-        FROM bookings 
-        WHERE event_id = %s 
-        ORDER BY booking_date DESC
-        """
-        
-        cursor.execute(query, (event_id,))
-        results = cursor.fetchall()
-        
-        bookings = []
-        for result in results:
-            bookings.append({
-                'booking_reference': result[0],
-                'contact_name': result[1],
-                'contact_email': result[2],
-                'attendees_count': result[3],
-                'status': result[4],
-                'booking_date': result[5].strftime('%Y-%m-%d %H:%M:%S') if result[5] else '',
-                'payment_status': result[6]
-            })
-        
-        return bookings
-        
-    except mysql.connector.Error as e:
-        raise Exception(f"Database error: {e}")
-    finally:
-        if cursor:
-            cursor.close()
+    result = (
+        supabase.table("bookings")
+        .select(
+            "booking_reference, contact_name, contact_email, attendees_count, "
+            "status, booking_date, payment_status"
+        )
+        .eq("event_id", event_id)
+        .order("booking_date", desc=True)
+        .execute()
+    )
+
+    bookings = []
+    for row in result.data:
+        bookings.append(
+            {
+                "booking_reference": row["booking_reference"],
+                "contact_name": row["contact_name"],
+                "contact_email": row["contact_email"],
+                "attendees_count": row["attendees_count"],
+                "status": row["status"],
+                "booking_date": str(row.get("booking_date", "")),
+                "payment_status": row.get("payment_status"),
+            }
+        )
+    return bookings

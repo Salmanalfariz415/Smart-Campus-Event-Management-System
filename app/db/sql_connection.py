@@ -1,14 +1,10 @@
-import mysql.connector
-from dotenv import load_dotenv
-load_dotenv()
+"""
+Database connection module — Supabase client only.
+All psycopg2 / raw SQL code has been removed.
+"""
+from ..supabase_client import supabase
 
-import os
 
-def get_sql_connection():
-    connection = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password=os.getenv("DB_PASSWORD"),
-        database="campus_event_system"
-    )
-    return connection
+def get_supabase_client():
+    """Return the shared Supabase client instance."""
+    return supabase

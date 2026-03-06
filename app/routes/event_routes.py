@@ -1,5 +1,4 @@
 from flask import request, jsonify, Blueprint, render_template
-from app.db.sql_connection import get_sql_connection
 import app.dao.event_dao as event_dao
 import traceback
 from flask_cors import cross_origin
@@ -8,6 +7,8 @@ from app.supabase_client import supabase
 
 import os, uuid
 
+CORS_ORIGINS = ["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500",
+                "http://127.0.0.1:5501", "http://localhost:5501"]
 
 event_bp = Blueprint('event', __name__, url_prefix='/event')
 
@@ -17,38 +18,30 @@ def events_page():
     return render_template('events.html')
 
 @event_bp.route('/submit', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+@cross_origin(origins=CORS_ORIGINS)
 def submit():
-    connection = None
     try:
         data = request.get_json()
 
-        username = data.get('username')
-        event_type = data.get('event_type')  # scholastic or non-scholastic
-        event_sub_type = data.get('event_sub_type')  # specific category
-        description = data.get('description')
-        organization = data.get('organization')
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
-        start_time = data.get('start_time')
-        end_time = data.get('end_time')
-        venue = data.get('venue')
-        building = data.get('building')
-        capacity = data.get('capacity')
-        fee = data.get('fee')
-        reg = data.get('reg')
-        img = data.get('image')
-        contact = data.get('contact')
-        website = data.get('website')
-        tag = data.get('tag')
-
-        connection = get_sql_connection()
-
         event_id = event_dao.submitl(
-            connection, username, event_type, event_sub_type, description, organization,
-            start_date, end_date, start_time, end_time,
-            venue, building, capacity, fee, reg,
-            img, contact, website, tag
+            data.get('username'),
+            data.get('event_type'),
+            data.get('event_sub_type'),
+            data.get('description'),
+            data.get('organization'),
+            data.get('start_date'),
+            data.get('end_date'),
+            data.get('start_time'),
+            data.get('end_time'),
+            data.get('venue'),
+            data.get('building'),
+            data.get('capacity'),
+            data.get('fee'),
+            data.get('reg'),
+            data.get('image'),
+            data.get('contact'),
+            data.get('website'),
+            data.get('tag'),
         )
 
         return jsonify({
@@ -63,12 +56,8 @@ def submit():
             "details": str(e)
         }), 500
 
-    finally:
-        if connection:
-            connection.close()
-
 @event_bp.route('/image_upload', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+@cross_origin(origins=CORS_ORIGINS)
 def upload_image():
     try:
         if 'image' not in request.files:
@@ -99,12 +88,10 @@ def upload_image():
 
 
 @event_bp.route('/add_card', methods=['GET', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+@cross_origin(origins=CORS_ORIGINS)
 def add_card():
-    connection=None
     try:
-        connection = get_sql_connection()
-        result=event_dao.eventcard(connection)
+        result = event_dao.eventcard()
         return jsonify(result), 200
     except Exception as e:
         traceback.print_tb(e.__traceback__)
@@ -112,6 +99,3 @@ def add_card():
             "error": "Event retrieval failed",
             "details": str(e)
         }), 500
-    finally:
-        if connection:
-            connection.close()

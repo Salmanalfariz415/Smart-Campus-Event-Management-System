@@ -1,4 +1,5 @@
 // Handle event type selection
+let uploadedImageUrl = null;
 const eventRadios = document.querySelectorAll('input[name="eventType"]');
 
 // Initialize dropdown as disabled
@@ -122,8 +123,8 @@ document.querySelector('form').addEventListener('submit', async (e) => {
                 end_time: endTime,
                 venue: venue,
                 building: building,
-                capacity: capacity || null,
-                fee: fee || 0,
+                capacity: capacity ? parseInt(capacity) : null,
+                fee: fee ? parseFloat(fee) : 0,
                 reg: registrationRequired,
                 image: uploadedImageUrl,
                 contact: contactEmail,
@@ -134,7 +135,7 @@ document.querySelector('form').addEventListener('submit', async (e) => {
 
         if (!res.ok) {
             const errorData = await res.json();
-            throw new Error(errorData.message || "Problem in submission");
+            throw new Error(errorData.details || errorData.error || "Problem in submission");
         }
 
         const data = await res.json();

@@ -1,12 +1,10 @@
 from flask import request, jsonify, Blueprint
-from app.db.sql_connection import get_sql_connection
 import app.dao.auth_dao as auth_dao
 import app.dao.booking_dao as booking_dao
 import traceback
 from flask_cors import cross_origin
 import jwt
 import os
-import bcrypt
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,104 +22,64 @@ def _get_user_id_from_token():
     return payload['user_id'], payload.get('user_type', 'user')
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
 @auth_bp.route('/register', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+@cross_origin(origins=CORS_ORIGINS)
 def register():
     if request.method == 'OPTIONS':
         return '', 200
-
-    connection = None
     try:
         data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-
-        connection = get_sql_connection()
-        result = auth_dao.register_user(connection, username, password)
-
+        result = auth_dao.register_user(data.get('username'), data.get('password'))
         return jsonify({
             "message": "Registration successful",
             "user_id": result["user_id"],
             "token": result["token"]
         }), 201
-
     except Exception as e:
-        print("=== ERROR ===")
-        print(str(e))
-        print(traceback.format_exc())
-        return jsonify({"error": str(e)}), 500
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 400
 
-    finally:
-        if connection:
-            connection.close()
 
-@auth_bp.route('/login',methods=['POST'])
-@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+@auth_bp.route('/login', methods=['POST'])
+@cross_origin(origins=CORS_ORIGINS)
 def login():
-    connection = None
     try:
-        connection = get_sql_connection()
         data = request.get_json()
-        username = data.get('username')
-        password = data.get('password')
-        result=auth_dao.login_user(connection, username, password)
-        if result =="Incorrect username or password":
+        result = auth_dao.login_user(data.get('username'), data.get('password'))
+        if result == "Incorrect username or password":
             return jsonify({"message": "Incorrect username or password"}), 401
-        #this is to make sure the message "Login Successful" doesnt get when error
-        return jsonify({
-            "message": "Login successful",
-            "result": result
-        }), 200
-
+        return jsonify({"message": "Login successful", "result": result}), 200
     except Exception as e:
-        print("=== LOGIN ERROR ===")
-        print(traceback.format_exc())
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
-    finally:
-        if connection:
-            connection.close()
 
 @auth_bp.route('/register_organizer', methods=['POST', 'OPTIONS'])
-@cross_origin(origins=["http://localhost:63342", "http://127.0.0.1:5500", "http://localhost:5500", "http://127.0.0.1:5501", "http://localhost:5501"])
+@cross_origin(origins=CORS_ORIGINS)
 def register_organizer():
     if request.method == 'OPTIONS':
         return '', 200
-        
-    connection = None
     try:
-        connection = get_sql_connection()
         data = request.get_json()
-        
-        # Validate required fields
-        required_fields = ['org_name', 'org_type', 'contact_name', 'contact_position', 
-                          'email', 'phone', 'password']
-        
+        required_fields = ['org_name', 'org_type', 'contact_name', 'contact_position',
+                           'email', 'phone', 'password']
         for field in required_fields:
             if not data.get(field):
                 return jsonify({"error": f"Missing required field: {field}"}), 400
-        
-        # Check password confirmation
         if data.get('password') != data.get('confirm_password'):
             return jsonify({"error": "Passwords do not match"}), 400
-            
-        result = auth_dao.register_organizer(connection, data)
-        
+
+        result = auth_dao.register_organizer(data)
         return jsonify({
             "message": "Organizer registration successful",
             "user_id": result['user_id'],
-            "organizer_id": result['organizer_id']
+            "organizer_id": result['organizer_id'],
+            "token": result['token']
         }), 201
-
     except Exception as e:
-        print("=== ORGANIZER REGISTRATION ERROR ===")
-        print(str(e))
-        print(traceback.format_exc())
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-
-    finally:
-        if connection:
-            connection.close()
 
 
 # ── Profile endpoints ─────────────────────────────────────────────────────────
@@ -132,11 +90,9 @@ def get_profile():
     """Return the authenticated user's profile data."""
     if request.method == 'OPTIONS':
         return '', 200
-    connection = None
     try:
-        user_id, user_type = _get_user_id_from_token()
-        connection = get_sql_connection()
-        user_data = auth_dao.get_user_details(connection, user_id)
+        user_id, _ = _get_user_id_from_token()
+        user_data = auth_dao.get_user_details(user_id)
         if not user_data:
             return jsonify({"error": "User not found"}), 404
         return jsonify({"profile": user_data}), 200
@@ -147,11 +103,8 @@ def get_profile():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
     except Exception as e:
-        print(traceback.format_exc())
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-    finally:
-        if connection:
-            connection.close()
 
 
 @auth_bp.route('/my-bookings', methods=['GET', 'OPTIONS'])
@@ -160,11 +113,9 @@ def get_my_bookings():
     """Return all bookings belonging to the authenticated user."""
     if request.method == 'OPTIONS':
         return '', 200
-    connection = None
     try:
         user_id, _ = _get_user_id_from_token()
-        connection = get_sql_connection()
-        bookings = booking_dao.get_user_bookings(connection, user_id)
+        bookings = booking_dao.get_user_bookings(user_id)
         return jsonify({"bookings": bookings}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 401
@@ -173,11 +124,8 @@ def get_my_bookings():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
     except Exception as e:
-        print(traceback.format_exc())
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-    finally:
-        if connection:
-            connection.close()
 
 
 @auth_bp.route('/profile/update', methods=['POST', 'OPTIONS'])
@@ -186,32 +134,12 @@ def update_profile():
     """Update organizer details for the authenticated organizer user."""
     if request.method == 'OPTIONS':
         return '', 200
-    connection = None
     try:
         user_id, user_type = _get_user_id_from_token()
         if user_type != 'organizer':
             return jsonify({"error": "Only organizers can update organization info"}), 403
-
         data = request.get_json()
-        connection = get_sql_connection()
-        cursor = connection.cursor()
-        update_query = """
-        UPDATE organizers
-        SET org_name = %s, org_type = %s, org_description = %s,
-            contact_name = %s, contact_position = %s, phone = %s
-        WHERE user_id = %s
-        """
-        cursor.execute(update_query, (
-            data.get('org_name'),
-            data.get('org_type'),
-            data.get('org_description', ''),
-            data.get('contact_name'),
-            data.get('contact_position'),
-            data.get('phone'),
-            user_id
-        ))
-        connection.commit()
-        cursor.close()
+        auth_dao.update_organizer(user_id, data)
         return jsonify({"message": "Profile updated successfully"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 401
@@ -220,11 +148,8 @@ def update_profile():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
     except Exception as e:
-        print(traceback.format_exc())
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-    finally:
-        if connection:
-            connection.close()
 
 
 @auth_bp.route('/change-password', methods=['POST', 'OPTIONS'])
@@ -233,7 +158,6 @@ def change_password():
     """Change the authenticated user's password."""
     if request.method == 'OPTIONS':
         return '', 200
-    connection = None
     try:
         user_id, _ = _get_user_id_from_token()
         data = request.get_json()
@@ -245,22 +169,9 @@ def change_password():
         if len(new_password) < 6:
             return jsonify({"error": "New password must be at least 6 characters"}), 400
 
-        connection = get_sql_connection()
-        cursor = connection.cursor()
-
-        cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
-        row = cursor.fetchone()
-        if not row:
-            return jsonify({"error": "User not found"}), 404
-
-        stored_hash = row[0]
-        if not bcrypt.checkpw(current_password.encode('utf-8'), stored_hash.encode('utf-8')):
+        ok = auth_dao.change_password(user_id, current_password, new_password)
+        if not ok:
             return jsonify({"error": "Current password is incorrect"}), 401
-
-        new_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s", (new_hash, user_id))
-        connection.commit()
-        cursor.close()
         return jsonify({"message": "Password changed successfully"}), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 401
@@ -269,8 +180,5 @@ def change_password():
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid token"}), 401
     except Exception as e:
-        print(traceback.format_exc())
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
-    finally:
-        if connection:
-            connection.close()
